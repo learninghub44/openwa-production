@@ -794,3 +794,48 @@ export const statsApi = {
   getOverview: () => request<OverviewStats>('/stats/overview'),
   getMessages: (period: StatsPeriod) => request<MessageStats>(`/stats/messages?period=${period}`),
 };
+
+// =============================================================================
+// Tenant API
+// =============================================================================
+
+export type TenantPlan = 'free' | 'starter' | 'pro' | 'enterprise';
+
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  plan: TenantPlan;
+  isActive: boolean;
+  email?: string | null;
+  metadata?: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TenantProvisionedResponse extends Tenant {
+  sessionId: string;
+  apiKeyId: string;
+  apiKey: string;
+  qrUrl: string;
+  sessionStarted: boolean;
+}
+
+export interface CreateTenantPayload {
+  name: string;
+  slug: string;
+  plan?: TenantPlan;
+  email?: string;
+  apiKeyName?: string;
+  autoStart?: boolean;
+}
+
+export const tenantApi = {
+  list: () => request<Tenant[]>('/tenants'),
+  get: (id: string) => request<Tenant>(`/tenants/${id}`),
+  provision: (data: CreateTenantPayload) =>
+    request<TenantProvisionedResponse>('/tenants', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: string, data: Partial<{ name: string; plan: TenantPlan; email: string; isActive: boolean }>) =>
+    request<Tenant>(`/tenants/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  remove: (id: string) => request<void>(`/tenants/${id}`, { method: 'DELETE' }),
+};

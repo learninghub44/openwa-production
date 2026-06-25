@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Languages,
+  Users,
 } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { type UserRole } from '../hooks/useRole';
@@ -40,6 +41,7 @@ const allNavItems = [
   { to: '/webhooks', icon: Webhook, key: 'webhooks' as const, adminOnly: false },
   { to: '/templates', icon: ClipboardList, key: 'templates' as const, adminOnly: false },
   { to: '/api-keys', icon: Key, key: 'apiKeys' as const, adminOnly: true },
+  { to: '/tenants', icon: Users, key: 'tenants' as const, adminOnly: true },
   { to: '/message-tester', icon: Send, key: 'messageTester' as const, adminOnly: false },
   // Backend /infra/* is ADMIN-only; hide the nav item from non-admins (UX + defense-in-depth).
   { to: '/infrastructure', icon: Server, key: 'infrastructure' as const, adminOnly: true },

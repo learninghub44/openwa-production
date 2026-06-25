@@ -20,6 +20,7 @@ const ApiKeys = lazy(() => import('./pages/ApiKeys').then(m => ({ default: m.Api
 const MessageTester = lazy(() => import('./pages/MessageTester').then(m => ({ default: m.MessageTester })));
 const Infrastructure = lazy(() => import('./pages/Infrastructure').then(m => ({ default: m.Infrastructure })));
 const Plugins = lazy(() => import('./pages/Plugins'));
+const Tenants = lazy(() => import('./pages/Tenants').then(m => ({ default: m.Tenants })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -108,6 +109,7 @@ function AppContent() {
             <Route path="webhooks" element={<Webhooks />} />
             <Route path="templates" element={<Templates />} />
             {role === 'admin' && <Route path="api-keys" element={<ApiKeys />} />}
+            {role === 'admin' && <Route path="tenants" element={<Tenants />} />}
             <Route path="logs" element={<Logs />} />
             <Route path="message-tester" element={<MessageTester />} />
             <Route path="infrastructure" element={<Infrastructure />} />

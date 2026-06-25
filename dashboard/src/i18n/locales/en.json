@@ -74,6 +74,7 @@
     "messageTester": "Message Tester",
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
+    "tenants": "Tenants",
     "logs": "Logs"
   },
   "chats": {
