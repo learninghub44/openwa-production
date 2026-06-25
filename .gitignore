@@ -84,3 +84,4 @@ data/
 
 # Keep .env.example in git (it's a template, no secrets)
 !.env.example
+.github/workflows/
