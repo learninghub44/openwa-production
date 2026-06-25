@@ -8,7 +8,7 @@ import {
   OnApplicationBootstrap,
 } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, In, Not, IsNull, DataSource, FindManyOptions } from 'typeorm';
+import { Repository, In, DataSource, FindManyOptions } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { Session, SessionStatus } from './entities/session.entity';
 import { Message, MessageDirection, MessageStatus } from '../message/entities/message.entity';
@@ -163,33 +163,55 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
   async onApplicationBootstrap(): Promise<void> {
     if (process.env.AUTO_START_SESSIONS !== 'true') return;
 
-    const sessions = await this.sessionRepository.find({
-      where: { phone: Not(IsNull()), status: SessionStatus.DISCONNECTED },
+    // Multi-tenant mode: restart ALL disconnected sessions that belong to a tenant
+    // (identified by tenantId in config) OR that were previously authenticated (phone set).
+    // This ensures every tenant's session comes back online after a server restart without
+    // manual intervention.
+    const allDisconnected = await this.sessionRepository.find({
+      where: { status: SessionStatus.DISCONNECTED },
+    });
+
+    // A session should be auto-restarted if:
+    //  (a) it is a tenant-provisioned session (has tenantId in config), OR
+    //  (b) it was previously authenticated (phone is set — legacy behaviour)
+    const sessions = allDisconnected.filter(s => {
+      const cfg = s.config as Record<string, unknown> | null;
+      return cfg?.tenantId || s.phone !== null;
     });
 
     if (sessions.length === 0) return;
 
-    this.logger.log(`Auto-starting ${sessions.length} previously authenticated session(s)`, {
-      action: 'auto_start',
-      count: sessions.length,
-    });
+    // Separate tenant sessions from plain authenticated sessions for clearer logging
+    const tenantSessions = sessions.filter(s => (s.config as Record<string, unknown>)?.tenantId);
+    const authSessions = sessions.filter(s => !(s.config as Record<string, unknown>)?.tenantId && s.phone !== null);
+
+    this.logger.log(
+      `Auto-starting ${sessions.length} session(s) on boot ` +
+        `(${tenantSessions.length} tenant, ${authSessions.length} standalone)`,
+      { action: 'auto_start', count: sessions.length },
+    );
 
     for (let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
+      const cfg = session.config as Record<string, unknown> | null;
+      const tenantSlug = cfg?.tenantSlug as string | undefined;
+      const label = tenantSlug ? `[tenant:${tenantSlug}] ${session.name}` : session.name;
       try {
         await this.start(session.id);
-        this.logger.log(`Auto-started session: ${session.name}`, {
+        this.logger.log(`Auto-started session: ${label}`, {
           sessionId: session.id,
+          tenantSlug: tenantSlug ?? null,
           action: 'auto_start_success',
         });
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        this.logger.error(`Auto-start failed for session: ${session.name}`, errorMessage, {
+        this.logger.error(`Auto-start failed for session: ${label}`, errorMessage, {
           sessionId: session.id,
+          tenantSlug: tenantSlug ?? null,
           action: 'auto_start_failed',
         });
       }
-      // Throttle between sequential Chromium launches; no need to wait after the last one.
+      // Throttle between sequential launches to avoid overwhelming the engine.
       if (i < sessions.length - 1) {
         await this.delay(2000);
       }
