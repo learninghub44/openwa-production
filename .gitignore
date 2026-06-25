@@ -77,3 +77,10 @@ docs/plans/
 CLAUDE.md
 _docs/
 .superpowers/
+# OpenWA runtime data (never commit)
+data/
+*.sqlite
+*.sqlite-journal
+
+# Keep .env.example in git (it's a template, no secrets)
+!.env.example

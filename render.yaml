@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: openwa
+    runtime: node
+    region: frankfurt
+    plan: standard
+    buildCommand: npm ci --include=dev && npm run build:all
+    startCommand: node dist/main
+    healthCheckPath: /api/health/ready
+    disk:
+      name: openwa-data
+      mountPath: /app/data
+      sizeGB: 5
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "2785"
+      - key: ENGINE_TYPE
+        value: baileys
+      - key: DATABASE_TYPE
+        value: sqlite
+      - key: DATABASE_NAME
+        value: ./data/openwa.sqlite
+      - key: SESSION_DATA_PATH
+        value: ./data/sessions
+      - key: BAILEYS_AUTH_DIR
+        value: ./data/baileys
+      - key: STORAGE_TYPE
+        value: local
+      - key: STORAGE_LOCAL_PATH
+        value: ./data/media
+      - key: PLUGINS_DIR
+        value: ./data/plugins
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_SWAGGER
+        value: "true"
+      - key: QUEUE_ENABLED
+        value: "false"
+      - key: REDIS_ENABLED
+        value: "false"
+      - key: TRUSTED_PROXIES
+        value: "10.0.0.0/8"
+      - key: API_MASTER_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: ""
