@@ -1,4 +1,4 @@
-# OpenWA API Quick Reference
+# Zetu API Quick Reference
 
 **Base URL:** `https://your-openwa.onrender.com/api`  
 **Auth header:** `X-API-Key: YOUR_KEY`  

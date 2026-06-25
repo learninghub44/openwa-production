@@ -1,4 +1,4 @@
-# OpenWA — Deploy to Render (No Docker)
+# Zetu — Deploy to Render (No Docker)
 
 ## What this is
 One Render service that runs all your clients' WhatsApp sessions.
@@ -14,7 +14,7 @@ Each client gets their own session + scoped API key — full isolation.
 cd openwa-production
 git init
 git add .
-git commit -m "Initial OpenWA setup"
+git commit -m "Initial Zetu setup"
 git remote add origin https://github.com/learninghub44/openwa.git
 git push -u origin main
 ```
@@ -64,7 +64,7 @@ curl -H "X-API-Key: YOUR_MASTER_KEY" https://your-openwa.onrender.com/api/sessio
 export OPENWA_URL=https://your-openwa.onrender.com
 export OPENWA_MASTER_KEY=your_master_key
 
-node tenant-manager.js
+node zetu-tenant-manager.js
 # → choose option 2 (Add new tenant)
 ```
 
@@ -89,15 +89,15 @@ curl -X POST https://your-openwa.onrender.com/api/sessions/SESSION_ID/webhooks \
   }'
 ```
 
-Or use `tenant-manager.js` option 7.
+Or use `zetu-tenant-manager.js` option 7.
 
-Add `webhook-receiver.js` to your receiving app. It handles signature verification + routing.
+Add `zetu-webhook-receiver.js` to your receiving app. It handles signature verification + routing.
 
 ---
 
 ## Step 7 — Integrate with Your Apps
 
-Copy `openwa-sdk.js` into any of your projects:
+Copy `zetu-sdk.js` into any of your projects:
 
 ```js
 const wa = require('./openwa-sdk');
@@ -121,7 +121,7 @@ await wa.sendText('kadem-wa', member.phone, `💰 KES ${amount} sent to M-Pesa $
 ## Multi-tenant layout
 
 ```
-OpenWA (single Render service)
+Zetu (single Render service)
 ├── session: school-erp     ← CBC ERP fee messages
 │   API Key: owa_k1_aaa     ← scoped, only sees school-erp
 ├── session: househunt-wa   ← House Hunt property alerts

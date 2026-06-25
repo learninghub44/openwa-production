@@ -610,8 +610,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/learninghub44/Zetu.git
+cd Zetu
 
 # 2. Install dependencies (also installs dashboard dependencies)
 npm install
@@ -674,7 +674,7 @@ docker compose --profile full up -d
 
 ### Environment Variables
 
-OpenWA supports multiple infrastructure configurations. Choose based on your needs:
+Zetu supports multiple infrastructure configurations. Choose based on your needs:
 
 #### Minimal Profile (Development / Single Session)
 
@@ -697,7 +697,7 @@ STORAGE_LOCAL_PATH=./data/media
 REDIS_ENABLED=false
 QUEUE_ENABLED=false
 
-# Optional: seed a known admin key. If omitted, OpenWA generates a random key and writes data/.api-key.
+# Optional: seed a known admin key. If omitted, Zetu generates a random key and writes data/.api-key.
 API_MASTER_KEY=
 
 # Session

@@ -118,7 +118,7 @@ export class DockerService implements OnModuleInit {
   }
 
   /**
-   * List all OpenWA-related containers
+   * List all Zetu-related containers
    */
   async listContainers(): Promise<ContainerInfo[]> {
     if (!this.docker || !this.isAvailable) {
@@ -129,7 +129,7 @@ export class DockerService implements OnModuleInit {
       const containers = await this.docker.listContainers({ all: true });
       return containers
         .filter(c => {
-          // Filter by OpenWA labels or name prefix
+          // Filter by Zetu labels or name prefix
           const labels = c.Labels || {};
           return labels['com.openwa.service'] || c.Names?.some(n => n.startsWith('/openwa-'));
         })

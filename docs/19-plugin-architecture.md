@@ -28,7 +28,7 @@
 
 ## 19.1 Overview
 
-The plugin architecture enables OpenWA extensibility without modifying the core codebase. Plugins can add new features, integrate with external services, or customize behavior.
+The plugin architecture enables Zetu extensibility without modifying the core codebase. Plugins can add new features, integrate with external services, or customize behavior.
 
 ### Design Goals
 
@@ -109,7 +109,7 @@ plugins/
 {
   "name": "my-awesome-plugin",
   "version": "1.0.0",
-  "description": "An awesome plugin for OpenWA",
+  "description": "An awesome plugin for Zetu",
   "author": "Your Name",
   "license": "MIT",
 
@@ -167,7 +167,7 @@ plugins/
 ```typescript
 // plugins/my-plugin/index.ts
 
-import { OpenWAPlugin, PluginContext, MessageEvent, HookResult } from '@openwa/plugin-sdk';
+import { ZetuPlugin, PluginContext, MessageEvent, HookResult } from '@openwa/plugin-sdk';
 
 export interface MyPluginConfig {
   enabled: boolean;
@@ -178,7 +178,7 @@ export interface MyPluginConfig {
   };
 }
 
-export default class MyAwesomePlugin implements OpenWAPlugin<MyPluginConfig> {
+export default class MyAwesomePlugin implements ZetuPlugin<MyPluginConfig> {
   name = 'my-awesome-plugin';
   version = '1.0.0';
 
@@ -267,7 +267,7 @@ export default class MyAwesomePlugin implements OpenWAPlugin<MyPluginConfig> {
 ```typescript
 // @openwa/plugin-sdk/types.ts
 
-export interface OpenWAPlugin<TConfig = any> {
+export interface ZetuPlugin<TConfig = any> {
   name: string;
   version: string;
 
@@ -405,7 +405,7 @@ export interface PluginStorage {
 
 ```mermaid
 sequenceDiagram
-    participant Core as OpenWA Core
+    participant Core as Zetu Core
     participant HM as Hook Manager
     participant P1 as Plugin 1
     participant P2 as Plugin 2
@@ -521,7 +521,7 @@ export interface HookExecutionResult<T> {
 ```typescript
 // src/core/plugins/plugin-loader.ts
 
-import { OpenWAPlugin, PluginContext, PluginManifest } from './types';
+import { ZetuPlugin, PluginContext, PluginManifest } from './types';
 import { HookManager } from '../hooks/hook-manager';
 import { PluginSandbox } from './plugin-sandbox';
 import { PluginStorageImpl } from './plugin-storage';
@@ -682,7 +682,7 @@ export class PluginLoader {
 }
 
 interface LoadedPlugin {
-  instance: OpenWAPlugin;
+  instance: ZetuPlugin;
   manifest: PluginManifest;
   context: PluginContext;
   config: any;
@@ -696,7 +696,7 @@ interface LoadedPlugin {
 ```typescript
 // plugins/auto-reply/index.ts
 
-import { OpenWAPlugin, PluginContext, MessageEvent } from '@openwa/plugin-sdk';
+import { ZetuPlugin, PluginContext, MessageEvent } from '@openwa/plugin-sdk';
 
 interface AutoReplyConfig {
   enabled: boolean;
@@ -711,7 +711,7 @@ interface AutoReplyRule {
   matchType: 'exact' | 'contains' | 'regex' | 'startsWith';
 }
 
-export default class AutoReplyPlugin implements OpenWAPlugin<AutoReplyConfig> {
+export default class AutoReplyPlugin implements ZetuPlugin<AutoReplyConfig> {
   name = 'auto-reply';
   version = '1.0.0';
 
@@ -812,7 +812,7 @@ interface CompiledRule extends AutoReplyRule {
 ```typescript
 // plugins/translation/index.ts
 
-import { OpenWAPlugin, PluginContext, MessageEvent } from '@openwa/plugin-sdk';
+import { ZetuPlugin, PluginContext, MessageEvent } from '@openwa/plugin-sdk';
 
 interface TranslationConfig {
   enabled: boolean;
@@ -824,7 +824,7 @@ interface TranslationConfig {
   translateOutgoing: boolean;
 }
 
-export default class TranslationPlugin implements OpenWAPlugin<TranslationConfig> {
+export default class TranslationPlugin implements ZetuPlugin<TranslationConfig> {
   name = 'translation';
   version = '1.0.0';
 

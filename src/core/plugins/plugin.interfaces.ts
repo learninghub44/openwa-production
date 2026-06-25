@@ -1,6 +1,6 @@
 /**
  * Plugin System Interfaces
- * Defines the contract for OpenWA plugins
+ * Defines the contract for Zetu plugins
  */
 
 import { HookManager, HookEvent, HookHandler } from '../hooks';

@@ -27,7 +27,7 @@ X-Request-ID: optional-tracking-id (recommended)
 
 ### API Key Management
 
-OpenWA creates an initial admin API key on first run. The key is printed in the
+Zetu creates an initial admin API key on first run. The key is printed in the
 startup logs and written to:
 
 - `data/.api-key` for local development
@@ -100,7 +100,7 @@ curl -X POST http://localhost:2785/api/auth/api-keys \
 
 ## 6.2 Response Format
 
-> **OpenWA returns the raw handler payload directly — there is NO `{success, data, meta}`
+> **Zetu returns the raw handler payload directly — there is NO `{success, data, meta}`
 > envelope.** A resource endpoint returns that resource object; a list endpoint returns a
 > bare array. Read fields directly (`response.id`, not `response.data.id`). Errors use the
 > NestJS default shape with the HTTP status in the status line.
@@ -969,7 +969,7 @@ POST /api/sessions/:sessionId/templates
 {
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Zetu Store",
   "footer": "Reply STOP to unsubscribe."
 }
 ```
@@ -992,7 +992,7 @@ When rendered, the header, body, and footer are joined with blank lines.
   "sessionId": "sess_abc123",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Zetu Store",
   "footer": "Reply STOP to unsubscribe.",
   "createdAt": "2025-02-02T10:00:00.000Z",
   "updatedAt": "2025-02-02T10:00:00.000Z"
@@ -1120,7 +1120,7 @@ GET /api/sessions/:sessionId/contacts/:contactId/phone
 
 > **Best-effort.** `phone` is MSISDN digits when the account knows the mapping, or `null` otherwise —
 > `@lid` exists specifically to hide phone numbers, so a stranger you've never interacted with (or a
-> privacy-protected sender) won't resolve. This is a WhatsApp-engine limitation, not an OpenWA one.
+> privacy-protected sender) won't resolve. This is a WhatsApp-engine limitation, not an Zetu one.
 
 To get this resolved automatically on each incoming message instead of calling the endpoint, see
 `RESOLVE_LID_TO_PHONE` under [message.received](#messagereceived).
@@ -1322,17 +1322,17 @@ GET /api/health/live
 
 ### Webhook Idempotency
 
-OpenWA provides an idempotency mechanism to prevent duplicate processing on the client side.
+Zetu provides an idempotency mechanism to prevent duplicate processing on the client side.
 
 #### Delivery Semantics
 
 Webhook delivery is **at-least-once**. WhatsApp engines can re-fire an event for a single message, and
 failed deliveries are retried, so a consumer can receive the same event more than once. **Design your
-handler to be idempotent**, keyed on the `X-OpenWA-Idempotency-Key` header (or the `idempotencyKey`
+handler to be idempotent**, keyed on the `X-Zetu-Idempotency-Key` header (or the `idempotencyKey`
 field) — that key is content-based, so every duplicate of the same message carries the identical value;
 prefer it over hashing the payload yourself.
 
-As a safety net, OpenWA de-duplicates inbound `message.received` **server-side**: a re-fired event for a
+As a safety net, Zetu de-duplicates inbound `message.received` **server-side**: a re-fired event for a
 message already persisted is dropped before dispatch, so one registered webhook normally receives each
 inbound message once. This guard is best-effort defense-in-depth and does not remove the need for
 consumer-side idempotency on the key above.
@@ -1343,9 +1343,9 @@ consumer-side idempotency on the key above.
 |--------------|-------------|
 | `deliveryId` | Unique ID for each delivery attempt |
 | `idempotencyKey` | Unique key per event (same across retries) |
-| `X-OpenWA-Delivery-Id` | Header carrying the delivery ID |
-| `X-OpenWA-Idempotency-Key` | Header carrying the idempotency key |
-| `X-OpenWA-Retry-Count` | Retry attempt number (0 = first attempt) |
+| `X-Zetu-Delivery-Id` | Header carrying the delivery ID |
+| `X-Zetu-Idempotency-Key` | Header carrying the idempotency key |
+| `X-Zetu-Retry-Count` | Retry attempt number (0 = first attempt) |
 
 #### Idempotency Key Format
 
@@ -1631,7 +1631,7 @@ X-RateLimit-Reset: 1706868060
 
 ## 6.7 WebSocket Real-time API
 
-In addition to the REST API, OpenWA provides WebSocket for real-time updates.
+In addition to the REST API, Zetu provides WebSocket for real-time updates.
 
 > [!IMPORTANT]
 > The WebSocket format below is **canonical**. Client/server implementations must follow this `WSRequest/WSResponse` structure.
@@ -1860,7 +1860,7 @@ curl -X POST http://localhost:2785/api/sessions/sess_abc123/messages/send-text \
   -H "X-Request-ID: req_1706868000001" \
   -d '{
     "chatId": "628123456789@c.us",
-    "text": "Hello from OpenWA!"
+    "text": "Hello from Zetu!"
   }'
 
 # Send image
@@ -1910,7 +1910,7 @@ sendMessage('sess_abc123', '628123456789@c.us', 'Hello!')
 import time
 import requests
 
-class OpenWA:
+class Zetu:
     def __init__(self, base_url, api_key):
         self.base_url = base_url
         self.headers = {
@@ -1940,7 +1940,7 @@ class OpenWA:
         return response.json()
 
 # Usage
-client = OpenWA('http://localhost:2785/api', 'your-api-key')
+client = Zetu('http://localhost:2785/api', 'your-api-key')
 result = client.send_text('sess_abc123', '628123456789@c.us', 'Hello from Python!')
 print(f"Message ID: {result['messageId']}")
 ```

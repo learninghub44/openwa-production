@@ -1,6 +1,6 @@
-# OpenWA SDKs
+# Zetu SDKs
 
-Official client libraries for the [OpenWA](https://github.com/rmyndharis/OpenWA)
+Official client libraries for the [Zetu](https://github.com/learninghub44/Zetu)
 WhatsApp API Gateway.
 
 All three SDKs are **hand-written** against the exact API surface (paths, DTOs,
@@ -12,9 +12,9 @@ hand-written resource methods.
 
 | Language                | Package                         | Notes                       |
 | ----------------------- | ------------------------------- | --------------------------- |
-| JavaScript / TypeScript | [`@rmyndharis/openwa`](javascript/) | dual ESM/CJS, bundled types |
-| Python                  | [`rmyndharis-openwa`](python/)      | sync (httpx), PEP 561 typed |
-| PHP                     | [`rmyndharis/openwa`](php/)         | sync (Guzzle, PHP 8.1+)     |
+| JavaScript / TypeScript | [`@learninghub44/zetu`](javascript/) | dual ESM/CJS, bundled types |
+| Python                  | [`learninghub44-zetu`](python/)      | sync (httpx), PEP 561 typed |
+| PHP                     | [`learninghub44/zetu`](php/)         | sync (Guzzle, PHP 8.1+)     |
 
 ## Coverage
 
@@ -42,13 +42,13 @@ All three SDKs expose the same fluent resource surface:
 ## JavaScript / TypeScript
 
 ```bash
-npm install @rmyndharis/openwa
+npm install @learninghub44/zetu
 ```
 
 ```typescript
-import { OpenWAClient } from '@rmyndharis/openwa';
+import { ZetuClient } from '@learninghub44/zetu';
 
-const client = new OpenWAClient({
+const client = new ZetuClient({
   baseUrl: 'http://localhost:2785',
   apiKey: 'owa_k1_…',
 });
@@ -56,7 +56,7 @@ const client = new OpenWAClient({
 await client.sessions.start('my-session');
 const result = await client.messages.sendText('my-session', {
   chatId: '628123456789@c.us',
-  text: 'Hello from the OpenWA SDK!',
+  text: 'Hello from the Zetu SDK!',
 });
 console.log(result.messageId);
 ```
@@ -64,11 +64,11 @@ console.log(result.messageId);
 Errors are typed — branch with `instanceof`:
 
 ```typescript
-import { OpenWANotFoundError, OpenWAConflictError } from '@rmyndharis/openwa';
+import { ZetuNotFoundError, ZetuConflictError } from '@learninghub44/zetu';
 try {
   await client.messages.sendText(/* … */);
 } catch (e) {
-  if (e instanceof OpenWAConflictError) {
+  if (e instanceof ZetuConflictError) {
     /* engine not ready (409) */
   }
 }
@@ -80,13 +80,13 @@ try {
 ## Python
 
 ```bash
-pip install rmyndharis-openwa
+pip install learninghub44-zetu
 ```
 
 ```python
-from openwa import OpenWAClient, OpenWANotFoundError
+from zetu import ZetuClient, ZetuNotFoundError
 
-client = OpenWAClient(
+client = ZetuClient(
     base_url="http://localhost:2785",
     api_key="owa_k1_…",
 )
@@ -94,7 +94,7 @@ client = OpenWAClient(
 client.sessions.start("my-session")
 result = client.messages.send_text("my-session", {
     "chatId": "628123456789@c.us",
-    "text": "Hello from the OpenWA Python SDK!",
+    "text": "Hello from the Zetu Python SDK!",
 })
 print(result["messageId"])
 ```
@@ -105,12 +105,12 @@ monkey-patching required.
 ## PHP
 
 ```bash
-composer require rmyndharis/openwa
+composer require learninghub44/zetu
 ```
 
 ```php
 <?php
-use OpenWA\Client;
+use Zetu\Client;
 
 $client = new Client([
     'baseUrl' => 'http://localhost:2785',
@@ -120,7 +120,7 @@ $client = new Client([
 $client->sessions->start('my-session');
 $result = $client->messages->sendText('my-session', [
     'chatId' => '628123456789@c.us',
-    'text'   => 'Hello from the OpenWA PHP SDK!',
+    'text'   => 'Hello from the Zetu PHP SDK!',
 ]);
 echo $result['messageId'];
 ```

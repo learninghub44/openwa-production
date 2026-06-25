@@ -7,11 +7,11 @@
  */
 
 import { encodeSegment } from '../http.js';
-import type { OpenWAClient } from '../client.js';
+import type { ZetuClient } from '../client.js';
 import type { SendImageStatusRequest, SendTextStatusRequest, SendVideoStatusRequest, StatusRecord } from '../types.js';
 
 export class StatusResource {
-  constructor(private readonly client: OpenWAClient) {}
+  constructor(private readonly client: ZetuClient) {}
 
   /** Get all status updates. */
   list(sessionId: string): Promise<{ statuses: StatusRecord[] }> {

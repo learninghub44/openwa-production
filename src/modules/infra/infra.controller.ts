@@ -491,7 +491,7 @@ export class InfraController {
         .sort()
         .map(key => `${key}=${merged[key]}`);
       const contents = [
-        '# OpenWA Configuration',
+        '# Zetu Configuration',
         `# Generated at ${new Date().toISOString()}`,
         '# Managed via Dashboard > Infrastructure. Values in process env or project .env take precedence.',
         '',

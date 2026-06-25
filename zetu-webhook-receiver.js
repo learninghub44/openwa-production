@@ -1,5 +1,5 @@
 /**
- * OpenWA Webhook Receiver
+ * Zetu Webhook Receiver
  * Add to any of your existing Node.js/Express backends to receive WhatsApp events.
  *
  * Install: npm install express
@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3001;
 // ── Signature verification ────────────────────────────────────────────────────
 function verifySignature(req, rawBody) {
   if (!WEBHOOK_SECRET) return true;
-  const sig = req.headers['x-openwa-signature'];
+  const sig = req.headers['x-zetu-signature'];
   if (!sig) return false;
   const expected = crypto.createHmac('sha256', WEBHOOK_SECRET).update(rawBody).digest('hex');
   try { return crypto.timingSafeEqual(Buffer.from(sig, 'hex'), Buffer.from(expected, 'hex')); }
@@ -114,7 +114,7 @@ async function onSessionStatus(sessionId, data) {
   }
 }
 
-// ── Helper: send reply back via OpenWA ────────────────────────────────────────
+// ── Helper: send reply back via Zetu ────────────────────────────────────────
 async function sendReply(sessionId, to, text) {
   await fetch(`${process.env.OPENWA_URL}/api/sessions/${sessionId}/messages/send-text`, {
     method: 'POST',

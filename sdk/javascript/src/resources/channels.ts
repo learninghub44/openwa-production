@@ -6,7 +6,7 @@
  */
 
 import { encodeSegment } from '../http.js';
-import type { OpenWAClient } from '../client.js';
+import type { ZetuClient } from '../client.js';
 import type {
   ChannelMessageQuery,
   ChannelRecord,
@@ -16,7 +16,7 @@ import type {
 } from '../types.js';
 
 export class ChannelsResource {
-  constructor(private readonly client: OpenWAClient) {}
+  constructor(private readonly client: ZetuClient) {}
 
   /** List all channels/newsletters the session is subscribed to. */
   list(sessionId: string): Promise<ChannelRecord[]> {

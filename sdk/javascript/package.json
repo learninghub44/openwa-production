@@ -1,7 +1,7 @@
 {
-    "name": "@rmyndharis/openwa",
+    "name": "@learninghub44/zetu",
     "version": "0.1.0",
-    "description": "Official JavaScript/TypeScript SDK for OpenWA WhatsApp API Gateway",
+    "description": "Official JavaScript/TypeScript SDK for Zetu WhatsApp API Gateway",
     "type": "module",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
@@ -31,14 +31,14 @@
         "whatsapp",
         "api",
         "sdk",
-        "openwa",
+        "zetu",
         "gateway"
     ],
-    "author": "OpenWA Contributors",
+    "author": "Zetu Contributors",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/rmyndharis/OpenWA",
+        "url": "https://github.com/learninghub44/Zetu",
         "directory": "sdk/javascript"
     },
     "engines": {

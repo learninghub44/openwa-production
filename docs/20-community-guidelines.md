@@ -4,7 +4,7 @@
 
 ### Our Pledge
 
-OpenWA is committed to providing a welcoming and inclusive environment for everyone. We pledge to make participation in our project and community a harassment-free experience for all, regardless of:
+Zetu is committed to providing a welcoming and inclusive environment for everyone. We pledge to make participation in our project and community a harassment-free experience for all, regardless of:
 
 - Age, body size, disability, ethnicity, sex characteristics
 - Gender identity and expression
@@ -61,7 +61,7 @@ git clone https://github.com/YOUR_USERNAME/openwa.git
 cd openwa
 
 # 3. Add upstream remote
-git remote add upstream https://github.com/rmyndharis/OpenWA.git
+git remote add upstream https://github.com/learninghub44/Zetu.git
 
 # 4. Install dependencies
 npm install
@@ -218,7 +218,7 @@ Use the bug report template:
 Clear and concise description of the bug
 
 ## Environment
-- OpenWA Version:
+- Zetu Version:
 - Node.js Version:
 - OS:
 - Docker Version (if applicable):
@@ -291,9 +291,9 @@ Primary community forum for:
 
 Categories:
 - **Announcements**: Official announcements from maintainers
-- **Q&A**: Questions about using OpenWA
+- **Q&A**: Questions about using Zetu
 - **Ideas**: Feature suggestions and brainstorming
-- **Show and Tell**: Share your projects using OpenWA
+- **Show and Tell**: Share your projects using Zetu
 - **General**: General discussion
 
 ### Discord Server (Optional)
@@ -305,10 +305,10 @@ Real-time chat for:
 
 Channels:
 - `#general` - General discussion
-- `#support` - Help with OpenWA
+- `#support` - Help with Zetu
 - `#development` - Development discussions
 - `#showcase` - Share your projects
-- `#off-topic` - Non-OpenWA discussions
+- `#off-topic` - Non-Zetu discussions
 
 ### Support Priority
 
@@ -416,7 +416,7 @@ We value all contributions:
 ```markdown
 ## Contributors
 
-Thanks to all the people who have contributed to OpenWA!
+Thanks to all the people who have contributed to Zetu!
 
 <!-- ALL-CONTRIBUTORS-LIST:START -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->

@@ -521,7 +521,7 @@ describe('WebhookService', () => {
     it('drops reserved custom headers so the system headers always win', async () => {
       const webhook = createMockWebhook({
         events: ['message.received'],
-        headers: { 'X-OpenWA-Event': 'forged', 'Content-Type': 'text/plain', 'X-Custom': 'ok' },
+        headers: { 'X-Zetu-Event': 'forged', 'Content-Type': 'text/plain', 'X-Custom': 'ok' },
       });
       (repository.find as jest.Mock).mockResolvedValue([webhook]);
       (repository.update as jest.Mock).mockResolvedValue({ affected: 1 });
@@ -548,7 +548,7 @@ describe('WebhookService', () => {
 
       await service.dispatch('sess-1', 'message.received', {});
 
-      expect(captured['X-OpenWA-Event']).toBe('message.received'); // system value, not 'forged'
+      expect(captured['X-Zetu-Event']).toBe('message.received'); // system value, not 'forged'
       expect(captured['Content-Type']).toBe('application/json');
       expect(captured['X-Custom']).toBe('ok'); // legitimate custom header preserved
       mockFetch.mockReset();
@@ -645,7 +645,7 @@ describe('WebhookService', () => {
       await service.dispatch('sess-1', 'message.received', {});
 
       // Verify signature format
-      expect(capturedHeaders['X-OpenWA-Signature']).toMatch(/^sha256=[a-f0-9]{64}$/);
+      expect(capturedHeaders['X-Zetu-Signature']).toMatch(/^sha256=[a-f0-9]{64}$/);
 
       // Verify signature correctness
       const body = JSON.stringify({
@@ -657,7 +657,7 @@ describe('WebhookService', () => {
         deliveryId: 'd',
       });
       const expected = `sha256=${crypto.createHmac('sha256', 'test-secret-123').update(body).digest('hex')}`;
-      expect(capturedHeaders['X-OpenWA-Signature']).toBe(expected);
+      expect(capturedHeaders['X-Zetu-Signature']).toBe(expected);
 
       mockFetch.mockReset();
     });

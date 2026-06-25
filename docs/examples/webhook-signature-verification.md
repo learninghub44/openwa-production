@@ -1,18 +1,18 @@
 # Webhook Signature Verification
 
-OpenWA signs webhook deliveries when a webhook is configured with a secret. Receivers should verify the signature before processing the event.
+Zetu signs webhook deliveries when a webhook is configured with a secret. Receivers should verify the signature before processing the event.
 
 ## Headers
 
-OpenWA sends these system headers with webhook deliveries:
+Zetu sends these system headers with webhook deliveries:
 
 | Header | Description |
 | ------ | ----------- |
-| `X-OpenWA-Signature` | HMAC-SHA256 signature, present only when the webhook has a secret |
-| `X-OpenWA-Event` | Event name, for example `message.received` |
-| `X-OpenWA-Idempotency-Key` | Stable key for duplicate detection |
-| `X-OpenWA-Delivery-Id` | Unique identifier for this delivery (stable across retry attempts) |
-| `X-OpenWA-Retry-Count` | Retry count for the current delivery |
+| `X-Zetu-Signature` | HMAC-SHA256 signature, present only when the webhook has a secret |
+| `X-Zetu-Event` | Event name, for example `message.received` |
+| `X-Zetu-Idempotency-Key` | Stable key for duplicate detection |
+| `X-Zetu-Delivery-Id` | Unique identifier for this delivery (stable across retry attempts) |
+| `X-Zetu-Retry-Count` | Retry count for the current delivery |
 
 The signature format is:
 
@@ -33,7 +33,7 @@ const express = require('express');
 const app = express();
 const WEBHOOK_SECRET = process.env.OPENWA_WEBHOOK_SECRET;
 
-function verifyOpenWASignature(rawBody, signature, secret) {
+function verifyZetuSignature(rawBody, signature, secret) {
   if (!signature || !secret) return false;
 
   const expected =
@@ -48,9 +48,9 @@ function verifyOpenWASignature(rawBody, signature, secret) {
 }
 
 app.post('/openwa/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const signature = req.header('X-OpenWA-Signature');
+  const signature = req.header('X-Zetu-Signature');
 
-  if (!verifyOpenWASignature(req.body, signature, WEBHOOK_SECRET)) {
+  if (!verifyZetuSignature(req.body, signature, WEBHOOK_SECRET)) {
     return res.status(401).send('Invalid signature');
   }
 
@@ -103,9 +103,9 @@ async def openwa_webhook(request: Request):
 
 ## Processing Checklist
 
-- Verify `X-OpenWA-Signature` before trusting or parsing the event.
+- Verify `X-Zetu-Signature` before trusting or parsing the event.
 - Use the exact raw request body received by your HTTP server.
 - Use a constant-time comparison function.
 - Return `401` for invalid signatures.
-- Use `X-OpenWA-Idempotency-Key` to avoid duplicate processing on retries.
+- Use `X-Zetu-Idempotency-Key` to avoid duplicate processing on retries.
 - Return a `2xx` response only after the event is accepted for processing.

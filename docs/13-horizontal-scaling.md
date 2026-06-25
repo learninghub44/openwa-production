@@ -2,7 +2,7 @@
 
 > ## ⚠️ DESIGN REFERENCE ONLY — NOT IMPLEMENTED
 >
-> **OpenWA is currently a single-process, single-instance application.** Live WhatsApp
+> **Zetu is currently a single-process, single-instance application.** Live WhatsApp
 > engine state (browser + WebSocket + reconnect/error state) lives in an in-memory `Map`
 > in `SessionService`; there is **no** DB-backed session registry, **no** node-claim/lease,
 > and **no** Socket.IO Redis adapter (findings H1/H11).
@@ -14,9 +14,9 @@
 >
 > Everything in this guide (session-claim, node affinity, `replicas: 3`) is a **future
 > design sketch**, retained for planning. Until it is implemented, deploy with
-> **`replicas: 1`** for the OpenWA API service.
+> **`replicas: 1`** for the Zetu API service.
 
-This guide explains a *proposed* design for deploying OpenWA in a horizontally scaled environment for high availability and increased capacity.
+This guide explains a *proposed* design for deploying Zetu in a horizontally scaled environment for high availability and increased capacity.
 
 ## 13.1 Architecture Overview
 
@@ -26,10 +26,10 @@ flowchart TB
         NGINX[Nginx/Traefik]
     end
 
-    subgraph Nodes["OpenWA Nodes"]
-        N1[OpenWA Node 1]
-        N2[OpenWA Node 2]
-        N3[OpenWA Node 3]
+    subgraph Nodes["Zetu Nodes"]
+        N1[Zetu Node 1]
+        N2[Zetu Node 2]
+        N3[Zetu Node 3]
     end
 
     subgraph Storage["Shared Storage"]
@@ -105,7 +105,7 @@ version: '3.8'
 
 services:
   openwa:
-    image: ghcr.io/rmyndharis/openwa:0.4.6
+    image: ghcr.io/learninghub44/openwa:0.4.6
     deploy:
       replicas: 1 # MUST stay 1 until session-claim is implemented — multiple replicas on one session volume corrupt WhatsApp auth (H1/H11)
       update_config:
@@ -163,7 +163,7 @@ services:
     networks:
       - openwa-net
 
-  # NOTE (v0.4.0): OpenWA no longer ships a bundled Traefik container.
+  # NOTE (v0.4.0): Zetu no longer ships a bundled Traefik container.
   # For TLS / public exposure, bring your own reverse proxy (Traefik, nginx,
   # Caddy, a cloud load balancer, etc.) and point it at openwa:2785.
   # See section 13.5 for Traefik / nginx config examples.
@@ -263,7 +263,7 @@ spec:
     spec:
       containers:
         - name: openwa
-          image: ghcr.io/rmyndharis/openwa:0.4.6
+          image: ghcr.io/learninghub44/openwa:0.4.6
           ports:
             - containerPort: 2785
               name: http
@@ -405,7 +405,7 @@ http:
     sticky-session:
       headers:
         customResponseHeaders:
-          X-OpenWA-Node: '{{.Node}}'
+          X-Zetu-Node: '{{.Node}}'
 
   services:
     openwa:
@@ -506,7 +506,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: 'OpenWA node high memory usage'
+          summary: 'Zetu node high memory usage'
 
       - alert: NodeDown
         expr: up{job="openwa"} == 0
@@ -514,7 +514,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: 'OpenWA node is down'
+          summary: 'Zetu node is down'
 ```
 
 ### Health Check Endpoints

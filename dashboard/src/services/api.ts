@@ -1,4 +1,4 @@
-// API Service Layer for OpenWA Dashboard
+// API Service Layer for Zetu Dashboard
 // Centralized API client with TypeScript types
 
 // Resolve the API base URL. By default this is the same-origin relative path '/api',
@@ -709,8 +709,8 @@ export interface CatalogPlugin {
   author?: string;
   license?: string;
   keywords?: string[];
-  minOpenWAVersion?: string;
-  testedOpenWAVersion?: string;
+  minZetuVersion?: string;
+  testedZetuVersion?: string;
   homepage?: string;
   download?: string;
   installed: boolean;

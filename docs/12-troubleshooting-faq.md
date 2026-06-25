@@ -209,7 +209,7 @@ stuck. Often seen on ARM64 (e.g. Raspberry Pi) after upgrading to v0.2.x.
 stalls the post-link sync. (If you also see `chrome_crashpad_handler: --database is required` *and the
 session never starts at all*, that is a different problem — see "Session fails to launch …" below.)
 
-**Fix:** OpenWA reconciles a missed `ready` event when WhatsApp Web is connected, the injected
+**Fix:** Zetu reconciles a missed `ready` event when WhatsApp Web is connected, the injected
 runtime is available, and whatsapp-web.js has populated the linked account identity. If your
 environment still hits a WA-Web compatibility hang, pin a known-good WA-Web version with
 `WWEBJS_WEB_VERSION`:
@@ -675,8 +675,8 @@ docker exec openwa curl http://host.docker.internal:8080
 
 ### General Questions
 
-**Q: Is OpenWA safe to use?**
-> A: OpenWA uses unofficial WhatsApp Web API. While we implement best practices to avoid detection, there's inherent risk of account restrictions. We recommend:
+**Q: Is Zetu safe to use?**
+> A: Zetu uses unofficial WhatsApp Web API. While we implement best practices to avoid detection, there's inherent risk of account restrictions. We recommend:
 > - Use dedicated phone number (not personal)
 > - Don't send spam or bulk unsolicited messages
 > - Follow WhatsApp's Terms of Service
@@ -691,7 +691,7 @@ docker exec openwa curl http://host.docker.internal:8080
 > With `ENGINE_TYPE=baileys` (browser-free), RAM per session is significantly lower — you can run more sessions on the same hardware. Exact figures depend on message volume and group membership.
 
 **Q: Can I use WhatsApp Business account?**
-> A: Yes, OpenWA works with both personal and WhatsApp Business accounts. Note that WhatsApp Business API (official Meta API) is different and not supported.
+> A: Yes, Zetu works with both personal and WhatsApp Business accounts. Note that WhatsApp Business API (official Meta API) is different and not supported.
 
 **Q: How to avoid getting banned?**
 > Best practices:
@@ -890,7 +890,7 @@ When creating GitHub issue, include:
 
 ```markdown
 ## Environment
-- OpenWA version: x.x.x
+- Zetu version: x.x.x
 - Docker version: x.x.x
 - OS: Ubuntu 22.04 / macOS / Windows
 - Database: SQLite / PostgreSQL
@@ -923,8 +923,8 @@ When creating GitHub issue, include:
 
 ### Community Resources
 
-- **GitHub Issues**: [github.com/rmyndharis/OpenWA/issues](https://github.com/rmyndharis/OpenWA/issues)
-- **Discussions**: [github.com/rmyndharis/OpenWA/discussions](https://github.com/rmyndharis/OpenWA/discussions)
+- **GitHub Issues**: [github.com/learninghub44/Zetu/issues](https://github.com/learninghub44/Zetu/issues)
+- **Discussions**: [github.com/learninghub44/Zetu/discussions](https://github.com/learninghub44/Zetu/discussions)
 - **Discord**: [discord.gg/openwa](https://discord.gg/openwa) (if available)
 - **Stack Overflow**: Tag with `openwa`
 ---

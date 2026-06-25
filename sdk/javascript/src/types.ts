@@ -1,5 +1,5 @@
 /**
- * Request and response type definitions for the OpenWA API.
+ * Request and response type definitions for the Zetu API.
  *
  * IMPORTANT (hybrid codegen strategy): this module is the single source of truth
  * for wire types. It is the part most prone to drift with the backend, and is
@@ -440,7 +440,7 @@ export interface WebhookFilters {
 export interface CreateWebhookRequest {
   url: string;
   events?: WebhookEvent[];
-  /** HMAC secret; signed as `X-OpenWA-Signature: sha256=…`. */
+  /** HMAC secret; signed as `X-Zetu-Signature: sha256=…`. */
   secret?: string;
   headers?: Record<string, string>;
   filters?: WebhookFilters | null;

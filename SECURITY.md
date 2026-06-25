@@ -20,8 +20,8 @@ Security fixes land on the latest minor release. Please upgrade older deployment
 Report it privately through either channel:
 
 - **GitHub Security Advisories** (preferred) — open a private report at
-  <https://github.com/rmyndharis/OpenWA/security/advisories/new>
-- **Email** — yudhi@rmyndharis.com
+  <https://github.com/learninghub44/OpenWA/security/advisories/new>
+- **Email** — yudhi@learninghub44.com
 
 Please include, where possible:
 

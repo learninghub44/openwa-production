@@ -153,7 +153,7 @@ export class WebhookService {
       idempotencyKey: generateIdempotencyKey('test', { webhookId: webhook.id }),
       deliveryId: generateDeliveryId(),
       data: {
-        message: 'This is a test webhook from OpenWA',
+        message: 'This is a test webhook from Zetu',
         webhookId: webhook.id,
         url: webhook.url,
       },
@@ -164,15 +164,15 @@ export class WebhookService {
       // Custom headers FIRST so the system headers below always win.
       ...this.sanitizeCustomHeaders(webhook.headers),
       'Content-Type': 'application/json',
-      'User-Agent': 'OpenWA-Webhook/1.0.0',
-      'X-OpenWA-Event': 'test',
-      'X-OpenWA-Idempotency-Key': testPayload.idempotencyKey,
-      'X-OpenWA-Delivery-Id': testPayload.deliveryId,
-      'X-OpenWA-Retry-Count': '0',
+      'User-Agent': 'Zetu-Webhook/1.0.0',
+      'X-Zetu-Event': 'test',
+      'X-Zetu-Idempotency-Key': testPayload.idempotencyKey,
+      'X-Zetu-Delivery-Id': testPayload.deliveryId,
+      'X-Zetu-Retry-Count': '0',
     };
 
     if (webhook.secret) {
-      headers['X-OpenWA-Signature'] = this.generateSignature(body, webhook.secret);
+      headers['X-Zetu-Signature'] = this.generateSignature(body, webhook.secret);
     }
 
     try {
@@ -262,11 +262,11 @@ export class WebhookService {
       const headers: Record<string, string> = {
         ...this.sanitizeCustomHeaders(webhook.headers),
         'Content-Type': 'application/json',
-        'User-Agent': 'OpenWA-Webhook/1.0.0',
-        'X-OpenWA-Event': event,
-        'X-OpenWA-Idempotency-Key': idempotencyKey,
-        'X-OpenWA-Delivery-Id': deliveryId,
-        'X-OpenWA-Retry-Count': '0',
+        'User-Agent': 'Zetu-Webhook/1.0.0',
+        'X-Zetu-Event': event,
+        'X-Zetu-Idempotency-Key': idempotencyKey,
+        'X-Zetu-Delivery-Id': deliveryId,
+        'X-Zetu-Retry-Count': '0',
       };
 
       // Use queue if available, otherwise fallback to direct delivery
@@ -279,7 +279,7 @@ export class WebhookService {
           const signature = webhook.secret ? this.generateSignature(JSON.stringify(finalPayload), webhook.secret) : '';
 
           if (webhook.secret) {
-            headers['X-OpenWA-Signature'] = signature;
+            headers['X-Zetu-Signature'] = signature;
           }
 
           const jobData: WebhookJobData = {
@@ -375,11 +375,11 @@ export class WebhookService {
     const body = JSON.stringify(payload);
 
     // Update retry count header
-    headers['X-OpenWA-Retry-Count'] = String(attempt - 1);
+    headers['X-Zetu-Retry-Count'] = String(attempt - 1);
 
     // Add signature if secret is configured and not already present
-    if (webhook.secret && !headers['X-OpenWA-Signature']) {
-      headers['X-OpenWA-Signature'] = this.generateSignature(body, webhook.secret);
+    if (webhook.secret && !headers['X-Zetu-Signature']) {
+      headers['X-Zetu-Signature'] = this.generateSignature(body, webhook.secret);
     }
 
     try {
@@ -428,7 +428,7 @@ export class WebhookService {
 
   /**
    * Drop operator-supplied custom headers that target reserved names (Content-Type or any
-   * X-OpenWA-* header) so a webhook config cannot forge the signature/event/idempotency
+   * X-Zetu-* header) so a webhook config cannot forge the signature/event/idempotency
    * headers. Spread the result BEFORE the system headers so system always wins.
    */
   private sanitizeCustomHeaders(custom: Record<string, string> | null | undefined): Record<string, string> {

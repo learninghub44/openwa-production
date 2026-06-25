@@ -2,7 +2,7 @@
 
 ## 18.1 Overview
 
-OpenWA provides official SDKs for multiple programming languages to simplify API integration. This document describes the SDK design and specifications.
+Zetu provides official SDKs for multiple programming languages to simplify API integration. This document describes the SDK design and specifications.
 
 ### Supported Languages
 
@@ -55,9 +55,9 @@ pnpm add @openwa/sdk
 ### Quick Start
 
 ```typescript
-import { OpenWA } from '@openwa/sdk';
+import { Zetu } from '@openwa/sdk';
 
-const client = new OpenWA({
+const client = new Zetu({
   baseUrl: 'http://localhost:2785',
   apiKey: 'your-api-key',
 });
@@ -94,7 +94,7 @@ client.on('session.status', async ({ sessionId, status }) => {
 ```typescript
 // src/index.ts
 
-export interface OpenWAConfig {
+export interface ZetuConfig {
   baseUrl: string;
   apiKey: string;
   timeout?: number;
@@ -102,8 +102,8 @@ export interface OpenWAConfig {
   debug?: boolean;
 }
 
-export class OpenWA extends EventEmitter {
-  private config: OpenWAConfig;
+export class Zetu extends EventEmitter {
+  private config: ZetuConfig;
   private http: HttpClient;
   private ws: WebSocketClient;
 
@@ -115,7 +115,7 @@ export class OpenWA extends EventEmitter {
   public webhooks: WebhooksResource;
   public apiKeys: ApiKeysResource;
 
-  constructor(config: OpenWAConfig) {
+  constructor(config: ZetuConfig) {
     super();
     this.config = this.validateConfig(config);
     this.http = new HttpClient(this.config);
@@ -419,7 +419,7 @@ export class MessageBuilder {
 ```typescript
 // src/events/index.ts
 
-export interface OpenWAEvents {
+export interface ZetuEvents {
   // Session events
   'session.status': (data: SessionStatusEvent) => void;
   'session.qr': (data: SessionQrEvent) => void;
@@ -454,7 +454,7 @@ export interface MessageAckEvent {
 }
 
 // Usage with typed events
-const client = new OpenWA({ ... });
+const client = new Zetu({ ... });
 
 client.on('message.received', ({ sessionId, message }) => {
   console.log(`[${sessionId}] New message from ${message.from}: ${message.body}`);
@@ -470,7 +470,7 @@ client.on('message.ack', ({ messageId, ack }) => {
 ```typescript
 // src/errors/index.ts
 
-export class OpenWAError extends Error {
+export class ZetuError extends Error {
   constructor(
     message: string,
     public code: string,
@@ -478,32 +478,32 @@ export class OpenWAError extends Error {
     public details?: unknown,
   ) {
     super(message);
-    this.name = 'OpenWAError';
+    this.name = 'ZetuError';
   }
 }
 
-export class ValidationError extends OpenWAError {
+export class ValidationError extends ZetuError {
   constructor(message: string, details?: unknown) {
     super(message, 'VALIDATION_ERROR', 400, details);
     this.name = 'ValidationError';
   }
 }
 
-export class AuthenticationError extends OpenWAError {
+export class AuthenticationError extends ZetuError {
   constructor(message = 'Invalid API key') {
     super(message, 'AUTHENTICATION_ERROR', 401);
     this.name = 'AuthenticationError';
   }
 }
 
-export class SessionNotFoundError extends OpenWAError {
+export class SessionNotFoundError extends ZetuError {
   constructor(sessionId: string) {
     super(`Session '${sessionId}' not found`, 'SESSION_NOT_FOUND', 404);
     this.name = 'SessionNotFoundError';
   }
 }
 
-export class RateLimitError extends OpenWAError {
+export class RateLimitError extends ZetuError {
   constructor(public retryAfter: number) {
     super(`Rate limited. Retry after ${retryAfter}ms`, 'RATE_LIMIT_EXCEEDED', 429);
     this.name = 'RateLimitError';
@@ -542,11 +542,11 @@ pip install openwa-sdk
 ### Quick Start
 
 ```python
-from openwa import OpenWA
+from openwa import Zetu
 import asyncio
 
 async def main():
-    client = OpenWA(
+    client = Zetu(
         base_url="http://localhost:2785",
         api_key="your-api-key"
     )
@@ -608,7 +608,7 @@ class Message:
     status: Optional[str] = None
     is_from_me: bool = False
 
-class OpenWA:
+class Zetu:
     def __init__(
         self,
         base_url: str,
@@ -647,7 +647,7 @@ class OpenWA:
                 data = await response.json()
 
                 if not response.ok:
-                    raise OpenWAError(
+                    raise ZetuError(
                         message=data.get("message", "Unknown error"),
                         code=str(response.status),
                         status=response.status
@@ -660,7 +660,7 @@ class OpenWA:
 
 
 class SessionsResource:
-    def __init__(self, client: OpenWA):
+    def __init__(self, client: Zetu):
         self.client = client
 
     async def list(
@@ -721,7 +721,7 @@ class SessionsResource:
 
 
 class MessagesResource:
-    def __init__(self, client: OpenWA):
+    def __init__(self, client: Zetu):
         self.client = client
 
     async def send(
@@ -777,7 +777,7 @@ class MessagesResource:
         )
 
 
-class OpenWAError(Exception):
+class ZetuError(Exception):
     def __init__(self, message: str, code: str, status: int):
         super().__init__(message)
         self.code = code
@@ -789,14 +789,14 @@ class OpenWAError(Exception):
 ```python
 # openwa/sync.py
 
-from .async_client import OpenWA as AsyncOpenWA
+from .async_client import Zetu as AsyncZetu
 import asyncio
 
-class OpenWASync:
-    """Synchronous wrapper for OpenWA client"""
+class ZetuSync:
+    """Synchronous wrapper for Zetu client"""
 
     def __init__(self, **kwargs):
-        self._async_client = AsyncOpenWA(**kwargs)
+        self._async_client = AsyncZetu(**kwargs)
         self._loop = asyncio.new_event_loop()
 
     def _run(self, coro):
@@ -833,9 +833,9 @@ class SessionsResourceSync:
 
 
 # Usage
-from openwa.sync import OpenWASync
+from openwa.sync import ZetuSync
 
-client = OpenWASync(base_url="http://localhost:2785", api_key="your-key")
+client = ZetuSync(base_url="http://localhost:2785", api_key="your-key")
 sessions = client.sessions.list()
 ```
 
@@ -852,8 +852,8 @@ composer require openwa/sdk
 ```php
 <?php
 
-use OpenWA\Client;
-use OpenWA\Resources\Messages;
+use Zetu\Client;
+use Zetu\Resources\Messages;
 
 $client = new Client([
     'baseUrl' => 'http://localhost:2785',
@@ -882,15 +882,15 @@ echo "Message sent: " . $message->id;
 <?php
 // src/Client.php
 
-namespace OpenWA;
+namespace Zetu;
 
 use GuzzleHttp\Client as HttpClient;
-use OpenWA\Resources\Sessions;
-use OpenWA\Resources\Messages;
-use OpenWA\Resources\Contacts;
-use OpenWA\Resources\Groups;
-use OpenWA\Resources\Webhooks;
-use OpenWA\Exceptions\OpenWAException;
+use Zetu\Resources\Sessions;
+use Zetu\Resources\Messages;
+use Zetu\Resources\Contacts;
+use Zetu\Resources\Groups;
+use Zetu\Resources\Webhooks;
+use Zetu\Exceptions\ZetuException;
 
 class Client
 {
@@ -937,7 +937,7 @@ class Client
             $response = $e->getResponse();
             $data = $response ? json_decode($response->getBody()->getContents(), true) : null;
 
-            throw new OpenWAException(
+            throw new ZetuException(
                 $data['message'] ?? $e->getMessage(),
                 'HTTP_ERROR',
                 $response ? $response->getStatusCode() : 0
@@ -956,10 +956,10 @@ class Client
 <?php
 // src/Resources/Sessions.php
 
-namespace OpenWA\Resources;
+namespace Zetu\Resources;
 
-use OpenWA\Client;
-use OpenWA\Models\Session;
+use Zetu\Client;
+use Zetu\Models\Session;
 
 class Sessions
 {
@@ -1025,10 +1025,10 @@ class Sessions
 <?php
 // src/Resources/Messages.php
 
-namespace OpenWA\Resources;
+namespace Zetu\Resources;
 
-use OpenWA\Client;
-use OpenWA\Models\Message;
+use Zetu\Client;
+use Zetu\Models\Message;
 
 class Messages
 {
@@ -1115,27 +1115,27 @@ class Messages
 ### Installation
 
 ```bash
-npm install @rmyndharis/n8n-nodes-openwa
+npm install @learninghub44/n8n-nodes-openwa
 ```
 
 ### Node Configuration
 
 ```typescript
-// nodes/OpenWA/OpenWA.node.ts
+// nodes/Zetu/Zetu.node.ts
 
 import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
 
-export class OpenWA implements INodeType {
+export class Zetu implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'OpenWA',
+    displayName: 'Zetu',
     name: 'openWA',
     icon: 'file:openwa.svg',
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-    description: 'Send WhatsApp messages via OpenWA',
+    description: 'Send WhatsApp messages via Zetu',
     defaults: {
-      name: 'OpenWA',
+      name: 'Zetu',
     },
     inputs: ['main'],
     outputs: ['main'],
@@ -1325,20 +1325,20 @@ export class OpenWA implements INodeType {
 ### Trigger Node
 
 ```typescript
-// nodes/OpenWA/OpenWATrigger.node.ts
+// nodes/Zetu/ZetuTrigger.node.ts
 
 import { IHookFunctions, IWebhookFunctions, INodeType, INodeTypeDescription, IWebhookResponseData } from 'n8n-workflow';
 
-export class OpenWATrigger implements INodeType {
+export class ZetuTrigger implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'OpenWA Trigger',
+    displayName: 'Zetu Trigger',
     name: 'openWATrigger',
     icon: 'file:openwa.svg',
     group: ['trigger'],
     version: 1,
-    description: 'Starts workflow on OpenWA events',
+    description: 'Starts workflow on Zetu events',
     defaults: {
-      name: 'OpenWA Trigger',
+      name: 'Zetu Trigger',
     },
     inputs: [],
     outputs: ['main'],
@@ -1383,7 +1383,7 @@ export class OpenWATrigger implements INodeType {
   webhookMethods = {
     default: {
       async checkExists(this: IHookFunctions): Promise<boolean> {
-        // Check if webhook already exists in OpenWA
+        // Check if webhook already exists in Zetu
         const webhookUrl = this.getNodeWebhookUrl('default');
         const credentials = await this.getCredentials('openWAApi');
 

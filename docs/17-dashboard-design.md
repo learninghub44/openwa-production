@@ -2,7 +2,7 @@
 
 ## 17.1 Overview
 
-The dashboard is a web-based management interface for OpenWA that lets users manage sessions, webhooks, and monitor activity without using the API directly.
+The dashboard is a web-based management interface for Zetu that lets users manage sessions, webhooks, and monitor activity without using the API directly.
 
 ### Tech Stack
 
@@ -23,7 +23,7 @@ flowchart LR
     end
 
     subgraph Backend
-        API[OpenWA API]
+        API[Zetu API]
         WS[WebSocket]
     end
 
@@ -100,7 +100,7 @@ flowchart TB
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  🔵 OpenWA                              🔍 Search    👤 Admin    ☀️  │
+│  🔵 Zetu                              🔍 Search    👤 Admin    ☀️  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  ┌─────────────┬─────────────┬─────────────┬─────────────┐          │

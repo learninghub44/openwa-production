@@ -94,13 +94,13 @@ describe('WebhookProcessor', () => {
     expect(hookManager.execute).toHaveBeenCalledWith('webhook:delivered', expect.anything(), expect.anything());
   });
 
-  it('sets X-OpenWA-Retry-Count to the attempt number', async () => {
+  it('sets X-Zetu-Retry-Count to the attempt number', async () => {
     mockFetch.mockResolvedValue({ ok: true, status: 200 });
 
     await processor.process(makeJob({}, 2));
 
     const call = mockFetch.mock.calls[0] as unknown as [string, { headers: Record<string, string> }];
-    expect(call[1].headers['X-OpenWA-Retry-Count']).toBe('2');
+    expect(call[1].headers['X-Zetu-Retry-Count']).toBe('2');
   });
 
   it('throws on a non-ok response WITHOUT firing webhook:error before the final attempt', async () => {

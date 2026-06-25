@@ -2,23 +2,23 @@
 
 ## Overview
 
-OpenWA provides official n8n community nodes for integrating WhatsApp automation into n8n workflows. This enables users to build powerful automations combining WhatsApp messaging with hundreds of other services available in n8n.
+Zetu provides official n8n community nodes for integrating WhatsApp automation into n8n workflows. This enables users to build powerful automations combining WhatsApp messaging with hundreds of other services available in n8n.
 
-**Repository:** https://github.com/rmyndharis/OpenWA-n8n
-**npm Package:** `@rmyndharis/n8n-nodes-openwa`
+**Repository:** https://github.com/learninghub44/Zetu-n8n
+**npm Package:** `@learninghub44/n8n-nodes-openwa`
 
 ## Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   n8n Workflow  │────▶│  OpenWA Node    │────▶│  OpenWA API     │
+│   n8n Workflow  │────▶│  Zetu Node    │────▶│  Zetu API     │
 │                 │     │  (credentials)  │     │  (your server)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                         │
                                                         ▼
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   n8n Workflow  │◀────│ OpenWA Trigger  │◀────│  Webhook POST   │
-│   (triggered)   │     │  (listens)      │     │  from OpenWA    │
+│   n8n Workflow  │◀────│ Zetu Trigger  │◀────│  Webhook POST   │
+│   (triggered)   │     │  (listens)      │     │  from Zetu    │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
@@ -28,7 +28,7 @@ OpenWA provides official n8n community nodes for integrating WhatsApp automation
 
 1. Go to **Settings > Community Nodes**
 2. Select **Install**
-3. Enter `@rmyndharis/n8n-nodes-openwa`
+3. Enter `@learninghub44/n8n-nodes-openwa`
 4. Agree to the risks and install
 5. Restart n8n
 
@@ -36,21 +36,21 @@ OpenWA provides official n8n community nodes for integrating WhatsApp automation
 
 ```bash
 cd ~/.n8n/nodes
-npm install @rmyndharis/n8n-nodes-openwa
+npm install @learninghub44/n8n-nodes-openwa
 ```
 
 ## Nodes
 
-### OpenWA Node
+### Zetu Node
 
-Execute operations on your OpenWA server.
+Execute operations on your Zetu server.
 
 #### Credentials Setup
 
 | Field      | Description                      | Example                  |
 | ---------- | -------------------------------- | ------------------------ |
-| Server URL | OpenWA server URL (without /api) | `https://wa.example.com` |
-| API Key    | API key from OpenWA dashboard    | `owa_xxxxxxxx...`        |
+| Server URL | Zetu server URL (without /api) | `https://wa.example.com` |
+| API Key    | API key from Zetu dashboard    | `owa_xxxxxxxx...`        |
 
 #### Resources & Operations
 
@@ -67,7 +67,7 @@ Execute operations on your OpenWA server.
 | Webhook  | Create        | Create a webhook            | `POST /api/sessions/:id/webhooks`               |
 | Webhook  | Delete        | Delete a webhook            | `DELETE /api/sessions/:id/webhooks/:webhookId`  |
 
-### OpenWA Trigger Node
+### Zetu Trigger Node
 
 Start workflows when WhatsApp events occur.
 
@@ -92,8 +92,8 @@ Start workflows when WhatsApp events occur.
 
 #### How It Works
 
-1. When workflow is activated, the trigger creates a webhook in OpenWA
-2. OpenWA sends events to n8n's webhook URL
+1. When workflow is activated, the trigger creates a webhook in Zetu
+2. Zetu sends events to n8n's webhook URL
 3. When workflow is deactivated, the webhook is automatically deleted
 
 #### Output Data Format
@@ -117,7 +117,7 @@ Start workflows when WhatsApp events occur.
 ```
 
 > **Deduplication.** Every delivery includes `idempotencyKey` and `deliveryId` in the body **and** as the
-> `X-OpenWA-Idempotency-Key` / `X-OpenWA-Delivery-Id` headers. `idempotencyKey` is **stable across retries**
+> `X-Zetu-Idempotency-Key` / `X-Zetu-Delivery-Id` headers. `idempotencyKey` is **stable across retries**
 > of the same event, while `deliveryId` is unique per HTTP attempt. Because a webhook can be retried, add a
 > dedup step keyed on `idempotencyKey` (e.g. an n8n IF or "Remove Duplicates" node) so a retried delivery
 > isn't processed twice.
@@ -129,7 +129,7 @@ Start workflows when WhatsApp events occur.
 Automatically reply to incoming messages with a welcome message.
 
 ```
-[OpenWA Trigger] → [IF: Check keyword] → [OpenWA: Send Text]
+[Zetu Trigger] → [IF: Check keyword] → [Zetu: Send Text]
      │
      └── Events: message.received
 ```
@@ -138,14 +138,14 @@ Automatically reply to incoming messages with a welcome message.
 
 - Trigger: `message.received`
 - IF Node: Check if `{{$json.data.body}}` contains "hello"
-- OpenWA: Send Text with welcome message
+- Zetu: Send Text with welcome message
 
 ### 2. Lead Collection to Google Sheets
 
 Capture incoming messages and save to Google Sheets.
 
 ```
-[OpenWA Trigger] → [Google Sheets: Append] → [OpenWA: Send Text]
+[Zetu Trigger] → [Google Sheets: Append] → [Zetu: Send Text]
      │                    │
      │                    └── Save: name, phone, message
      └── Events: message.received
@@ -156,7 +156,7 @@ Capture incoming messages and save to Google Sheets.
 Get notified on Slack when WhatsApp session disconnects.
 
 ```
-[OpenWA Trigger] → [Slack: Send Message]
+[Zetu Trigger] → [Slack: Send Message]
      │
      └── Events: session.disconnected
 ```
@@ -174,7 +174,7 @@ Please check and reconnect.
 Send WhatsApp notification when new order is received.
 
 ```
-[Webhook: New Order] → [OpenWA: Send Text]
+[Webhook: New Order] → [Zetu: Send Text]
                             │
                             └── "Thank you for your order #{{$json.orderId}}"
 ```
@@ -184,7 +184,7 @@ Send WhatsApp notification when new order is received.
 Send daily reminders to a list of contacts.
 
 ```
-[Schedule Trigger] → [Google Sheets: Get Rows] → [Loop] → [OpenWA: Send Text]
+[Schedule Trigger] → [Google Sheets: Get Rows] → [Loop] → [Zetu: Send Text]
      │                      │                                    │
      └── Daily 9AM          └── Get contacts                     └── Send reminder
 ```
@@ -196,14 +196,14 @@ Collect appointment requests over WhatsApp, check availability in an external sc
 See [n8n Appointment Booking Workflow](./examples/n8n-appointment-booking.md) for a complete example.
 
 ```
-[OpenWA Trigger] → [IF: Booking intent?] → [Set: Normalize request]
+[Zetu Trigger] → [IF: Booking intent?] → [Set: Normalize request]
                                                │
                                                ▼
                                       [Availability Source]
                                                │
                          ┌─────────────────────┴─────────────────────┐
                          ▼                                           ▼
-              [Create Booking] → [OpenWA: Send Text]      [OpenWA: Send Text]
+              [Create Booking] → [Zetu: Send Text]      [Zetu: Send Text]
                   confirmed confirmation                  alternative slots
 ```
 
@@ -214,7 +214,7 @@ See [n8n Appointment Booking Workflow](./examples/n8n-appointment-booking.md) fo
 Always add error handling in your workflows:
 
 ```
-[OpenWA Node] → [IF: Check success] → [Continue...]
+[Zetu Node] → [IF: Check success] → [Continue...]
                       │
                       └── [Error Handler]
 ```
@@ -224,7 +224,7 @@ Always add error handling in your workflows:
 WhatsApp has rate limits. Add delays between messages:
 
 ```
-[Loop Over Items] → [Wait: 2 seconds] → [OpenWA: Send Text]
+[Loop Over Items] → [Wait: 2 seconds] → [Zetu: Send Text]
 ```
 
 ### 3. Message Formatting
@@ -247,15 +247,15 @@ Always use the correct format for chat IDs:
 
 ### Credential Test Failed
 
-1. Verify OpenWA server is running
+1. Verify Zetu server is running
 2. Check API key is correct
 3. Ensure server URL doesn't have trailing slash
-4. Verify network connectivity between n8n and OpenWA
+4. Verify network connectivity between n8n and Zetu
 
 ### Trigger Not Receiving Events
 
-1. Check webhook was created in OpenWA dashboard
-2. Verify n8n webhook URL is accessible from OpenWA server
+1. Check webhook was created in Zetu dashboard
+2. Verify n8n webhook URL is accessible from Zetu server
 3. Check firewall/proxy settings
 4. Ensure session is connected and active
 
@@ -271,8 +271,8 @@ Always use the correct format for chat IDs:
 ### Building from Source
 
 ```bash
-git clone https://github.com/rmyndharis/OpenWA-n8n.git
-cd OpenWA-n8n
+git clone https://github.com/learninghub44/Zetu-n8n.git
+cd Zetu-n8n
 npm install
 npm run build
 ```
@@ -285,7 +285,7 @@ npm run dev
 
 # Link to local n8n
 cd ~/.n8n/nodes
-npm link /path/to/OpenWA-n8n
+npm link /path/to/Zetu-n8n
 ```
 
 ### Testing
@@ -305,7 +305,7 @@ docker run -it --rm \
 
 ## Related Documentation
 
-- [OpenWA API Specification](./06-api-specification.md)
+- [Zetu API Specification](./06-api-specification.md)
 - [Webhook System](./03-system-architecture.md#webhooks)
 - [n8n Appointment Booking Workflow](./examples/n8n-appointment-booking.md)
 - [n8n Documentation](https://docs.n8n.io/)

@@ -2,7 +2,7 @@
 
 ## 07.1 Overview
 
-This document provides a complete collection of OpenWA API endpoints with request/response examples for each endpoint. It can be used as a quick reference or imported into tools such as Postman, Insomnia, or Bruno.
+This document provides a complete collection of Zetu API endpoints with request/response examples for each endpoint. It can be used as a quick reference or imported into tools such as Postman, Insomnia, or Bruno.
 
 ### Base URL
 
@@ -399,11 +399,11 @@ curl -X POST http://localhost:2785/api/sessions/default/messages \
 
 **Interactive messages (Buttons / List): not supported**
 
-> ⚠️ **Buttons and List (interactive) messages are not available** through OpenWA's
+> ⚠️ **Buttons and List (interactive) messages are not available** through Zetu's
 > unofficial-client engines (`whatsapp-web.js` default or `baileys`). WhatsApp stopped
 > honoring the interactive-message payload for unofficial clients around 2021–2022 —
 > messages of this type are **silently dropped and never delivered** to recipients.
-> OpenWA therefore does not expose `type: "buttons"` or `type: "list"` endpoints;
+> Zetu therefore does not expose `type: "buttons"` or `type: "list"` endpoints;
 > sending interactive messages requires the official WhatsApp Business Cloud API.
 > (The earlier examples here were speculative and never implemented — see #158.)
 
@@ -934,7 +934,7 @@ curl -X POST \
 ## 07.8 API Keys API
 
 All API key management endpoints require an admin API key in `X-API-Key`.
-OpenWA creates the initial admin key on first run, prints it in the startup
+Zetu creates the initial admin key on first run, prints it in the startup
 logs, and writes it to `data/.api-key` (or `/app/data/.api-key` inside the API
 container). By default a random `owa_k1_...` admin key is generated on first run
 in all environments; set `ALLOW_DEV_API_KEY=true` to seed the well-known
@@ -1060,8 +1060,8 @@ curl -X POST \
 ```json
 {
   "info": {
-    "name": "OpenWA API",
-    "description": "OpenWA WhatsApp API Gateway",
+    "name": "Zetu API",
+    "description": "Zetu WhatsApp API Gateway",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -1180,7 +1180,7 @@ curl -X POST \
             "url": "{{baseUrl}}/api/sessions/{{sessionId}}/messages",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"phone\": \"628123456789@c.us\",\n  \"type\": \"text\",\n  \"body\": \"Hello from OpenWA!\"\n}",
+              "raw": "{\n  \"phone\": \"628123456789@c.us\",\n  \"type\": \"text\",\n  \"body\": \"Hello from Zetu!\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

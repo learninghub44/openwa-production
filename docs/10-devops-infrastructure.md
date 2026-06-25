@@ -159,7 +159,7 @@ version: '3.8'
 
 services:
   app:
-    image: ghcr.io/rmyndharis/openwa:latest
+    image: ghcr.io/learninghub44/openwa:latest
     deploy:
       replicas: 1
       resources:
@@ -351,7 +351,7 @@ jobs:
 flowchart TB
     subgraph Server["Single Server"]
         NGINX[Nginx Reverse Proxy]
-        NGINX --> APP[OpenWA App]
+        NGINX --> APP[Zetu App]
         APP --> PG[(PostgreSQL)]
         APP --> RD[(Redis)]
         APP --> FS[File Storage]
@@ -373,9 +373,9 @@ flowchart TB
     end
     
     subgraph AppServers["Application Servers"]
-        APP1[OpenWA 1]
-        APP2[OpenWA 2]
-        APP3[OpenWA N]
+        APP1[Zetu 1]
+        APP2[Zetu 2]
+        APP3[Zetu N]
     end
     
     subgraph DataLayer["Data Layer"]
@@ -754,8 +754,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "OpenWA service is down"
-          description: "The OpenWA application is not responding"
+          summary: "Zetu service is down"
+          description: "The Zetu application is not responding"
 ```
 
 ### AlertManager Configuration
@@ -943,7 +943,7 @@ export class MetricsService {
 ```json
 // monitoring/grafana/dashboards/openwa.json
 {
-  "title": "OpenWA Dashboard",
+  "title": "Zetu Dashboard",
   "uid": "openwa-main",
   "panels": [
     {

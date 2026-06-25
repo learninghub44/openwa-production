@@ -1,16 +1,16 @@
-# rmyndharis/openwa
+# learninghub44/zetu
 
-Official PHP SDK for the [OpenWA](https://github.com/rmyndharis/OpenWA) WhatsApp API Gateway.
+Official PHP SDK for the [Zetu](https://github.com/learninghub44/Zetu) WhatsApp API Gateway.
 
 A synchronous client built on [Guzzle](https://docs.guzzlephp.org/), PSR-4 autoloaded.
 
 ## Install
 
 ```bash
-composer require rmyndharis/openwa
+composer require learninghub44/zetu
 ```
 
-Requires PHP 8.1+ and Guzzle 7. The namespace is `OpenWA\`.
+Requires PHP 8.1+ and Guzzle 7. The namespace is `Zetu\`.
 
 ## Usage
 
@@ -18,7 +18,7 @@ Requires PHP 8.1+ and Guzzle 7. The namespace is `OpenWA\`.
 <?php
 require 'vendor/autoload.php';
 
-use OpenWA\Client;
+use Zetu\Client;
 
 $client = new Client([
     'baseUrl' => 'https://your-gateway.example.com',
@@ -29,7 +29,7 @@ $client->sessions->start('my-session');
 
 $result = $client->messages->sendText('my-session', [
     'chatId' => '628123456789@c.us',
-    'text'   => 'Hello from the OpenWA PHP SDK!',
+    'text'   => 'Hello from the Zetu PHP SDK!',
 ]);
 echo $result['messageId'];
 ```
@@ -46,18 +46,18 @@ $client = new Client([
 
 ## Errors
 
-A non-2xx response throws a typed `OpenWA\Exceptions\OpenWAApiException` subclass —
-`OpenWAAuthException` (401), `OpenWAForbiddenException` (403), `OpenWANotFoundException` (404),
-`OpenWAConflictException` (409), `OpenWARateLimitException` (429),
-`OpenWANotImplementedException` (501) — each exposing `getStatus()` and the parsed `getBody()`.
-A timeout throws `OpenWATimeoutException`.
+A non-2xx response throws a typed `Zetu\Exceptions\ZetuApiException` subclass —
+`ZetuAuthException` (401), `ZetuForbiddenException` (403), `ZetuNotFoundException` (404),
+`ZetuConflictException` (409), `ZetuRateLimitException` (429),
+`ZetuNotImplementedException` (501) — each exposing `getStatus()` and the parsed `getBody()`.
+A timeout throws `ZetuTimeoutException`.
 
 ```php
-use OpenWA\Exceptions\OpenWANotFoundException;
+use Zetu\Exceptions\ZetuNotFoundException;
 
 try {
     $client->sessions->get('missing');
-} catch (OpenWANotFoundException $e) {
+} catch (ZetuNotFoundException $e) {
     echo $e->getStatus();  // 404
 }
 ```

@@ -7,11 +7,11 @@
  */
 
 import { encodeSegment } from '../http.js';
-import type { OpenWAClient } from '../client.js';
+import type { ZetuClient } from '../client.js';
 import type { AddLabelRequest, LabelRecord, SuccessResult } from '../types.js';
 
 export class LabelsResource {
-  constructor(private readonly client: OpenWAClient) {}
+  constructor(private readonly client: ZetuClient) {}
 
   /** List all labels available in the business account. */
   list(sessionId: string): Promise<LabelRecord[]> {

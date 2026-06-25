@@ -1,30 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import {
-  OpenWAClient,
-  OpenWAApiError,
-  OpenWAAuthError,
-  OpenWAForbiddenError,
-  OpenWANotFoundError,
-  OpenWAConflictError,
-  OpenWARateLimitError,
-  OpenWANotImplementedError,
-  OpenWATimeoutError,
+  ZetuClient,
+  ZetuApiError,
+  ZetuAuthError,
+  ZetuForbiddenError,
+  ZetuNotFoundError,
+  ZetuConflictError,
+  ZetuRateLimitError,
+  ZetuNotImplementedError,
+  ZetuTimeoutError,
 } from '../src';
 import type { FetchLike } from '../src';
 import { MockTransport } from './helpers';
 
-function client(transport: MockTransport): OpenWAClient {
-  return new OpenWAClient({
+function client(transport: MockTransport): ZetuClient {
+  return new ZetuClient({
     baseUrl: 'http://localhost:2785',
     apiKey: 'owa_k1_test',
     fetch: transport.asFetch(),
   });
 }
 
-describe('OpenWAClient', () => {
+describe('ZetuClient', () => {
   it('requires baseUrl and apiKey', () => {
-    expect(() => new OpenWAClient({ baseUrl: '', apiKey: 'x' })).toThrow();
-    expect(() => new OpenWAClient({ baseUrl: 'http://x', apiKey: '' })).toThrow();
+    expect(() => new ZetuClient({ baseUrl: '', apiKey: 'x' })).toThrow();
+    expect(() => new ZetuClient({ baseUrl: 'http://x', apiKey: '' })).toThrow();
   });
 
   it('sends the API key as X-API-Key and JSON content type', async () => {
@@ -36,7 +36,7 @@ describe('OpenWAClient', () => {
 
   it('strips a trailing slash from baseUrl', async () => {
     const t = new MockTransport().on('GET', '/api/sessions', { body: [] });
-    const c = new OpenWAClient({ baseUrl: 'http://localhost:2785/', apiKey: 'k', fetch: t.asFetch() });
+    const c = new ZetuClient({ baseUrl: 'http://localhost:2785/', apiKey: 'k', fetch: t.asFetch() });
     await c.sessions.list();
     expect(t.lastCall!.url).toBe('http://localhost:2785/api/sessions');
   });
@@ -49,7 +49,7 @@ describe('OpenWAClient', () => {
       seenInit = init as RequestInit;
       return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } });
     };
-    const c = new OpenWAClient({ baseUrl: 'http://x', apiKey: 'k', fetch: recordingFetch });
+    const c = new ZetuClient({ baseUrl: 'http://x', apiKey: 'k', fetch: recordingFetch });
     await c.health.check();
     expect(seenInit?.redirect).toBe('manual');
   });
@@ -59,7 +59,7 @@ describe('OpenWAClient', () => {
     // JS transport aligned with the Python and PHP SDKs (which now also error on >= 300).
     const redirectingFetch: FetchLike = async () =>
       new Response('{"redirected":true}', { status: 302, headers: { location: 'http://evil.example/x' } });
-    const c = new OpenWAClient({ baseUrl: 'http://x', apiKey: 'k', fetch: redirectingFetch });
+    const c = new ZetuClient({ baseUrl: 'http://x', apiKey: 'k', fetch: redirectingFetch });
     await expect(c.sessions.list()).rejects.toThrow();
   });
 
@@ -80,12 +80,12 @@ describe('OpenWAClient', () => {
     expect(t.lastCall!.url).not.toContain('from=');
   });
 
-  it('maps a 404 to OpenWANotFoundError with parsed body', async () => {
+  it('maps a 404 to ZetuNotFoundError with parsed body', async () => {
     const t = new MockTransport().on('GET', '/api/sessions/missing', {
       status: 404,
       body: { statusCode: 404, message: 'Session not found', error: 'Not Found' },
     });
-    await expect(client(t).sessions.get('missing')).rejects.toBeInstanceOf(OpenWANotFoundError);
+    await expect(client(t).sessions.get('missing')).rejects.toBeInstanceOf(ZetuNotFoundError);
     await expect(client(t).sessions.get('missing')).rejects.toMatchObject({ status: 404 });
   });
 
@@ -101,24 +101,24 @@ describe('OpenWAClient', () => {
     await expect(client(t).sessions.delete('x')).resolves.toBeNull();
   });
 
-  it('OpenWAApiError.fromResponse parses the NestJS envelope', async () => {
+  it('ZetuApiError.fromResponse parses the NestJS envelope', async () => {
     const t = new MockTransport().on('POST', /send-text/, {
       status: 409,
       body: { statusCode: 409, message: 'Engine not ready', error: 'Conflict' },
     });
     await expect(client(t).messages.sendText('s', { chatId: 'a@c.us', text: 'hi' })).rejects.toBeInstanceOf(
-      OpenWAApiError,
+      ZetuApiError,
     );
   });
 
   it('maps each status code to its typed error subclass', async () => {
-    const cases: Array<[number, new (...a: never[]) => OpenWAApiError]> = [
-      [401, OpenWAAuthError],
-      [403, OpenWAForbiddenError],
-      [404, OpenWANotFoundError],
-      [409, OpenWAConflictError],
-      [429, OpenWARateLimitError],
-      [501, OpenWANotImplementedError],
+    const cases: Array<[number, new (...a: never[]) => ZetuApiError]> = [
+      [401, ZetuAuthError],
+      [403, ZetuForbiddenError],
+      [404, ZetuNotFoundError],
+      [409, ZetuConflictError],
+      [429, ZetuRateLimitError],
+      [501, ZetuNotImplementedError],
     ];
     for (const [status, cls] of cases) {
       const t = new MockTransport().on('GET', '/api/sessions', {
@@ -129,28 +129,28 @@ describe('OpenWAClient', () => {
     }
   });
 
-  it('falls back to the generic OpenWAApiError (with .status) for an unmapped status', async () => {
+  it('falls back to the generic ZetuApiError (with .status) for an unmapped status', async () => {
     const t = new MockTransport().on('GET', '/api/sessions', {
       status: 418,
       body: { statusCode: 418, message: 'teapot', error: 'Teapot' },
     });
     await expect(client(t).sessions.list()).rejects.toMatchObject({ status: 418 });
-    await expect(client(t).sessions.list()).rejects.toBeInstanceOf(OpenWAApiError);
+    await expect(client(t).sessions.list()).rejects.toBeInstanceOf(ZetuApiError);
   });
 
-  it('throws OpenWATimeoutError when the request aborts', async () => {
+  it('throws ZetuTimeoutError when the request aborts', async () => {
     const abortingFetch: FetchLike = async () => {
       const e = new Error('aborted');
       e.name = 'AbortError';
       throw e;
     };
-    const c = new OpenWAClient({ baseUrl: 'http://x', apiKey: 'k', fetch: abortingFetch });
-    await expect(c.sessions.list()).rejects.toBeInstanceOf(OpenWATimeoutError);
+    const c = new ZetuClient({ baseUrl: 'http://x', apiKey: 'k', fetch: abortingFetch });
+    await expect(c.sessions.list()).rejects.toBeInstanceOf(ZetuTimeoutError);
   });
 
   it('keeps X-API-Key winning over defaultHeaders', async () => {
     const t = new MockTransport().on('GET', '/api/sessions', { body: [] });
-    const c = new OpenWAClient({
+    const c = new ZetuClient({
       baseUrl: 'http://x',
       apiKey: 'REAL',
       defaultHeaders: { 'X-API-Key': 'EVIL', 'X-Trace': 'keep' },

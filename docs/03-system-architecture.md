@@ -12,7 +12,7 @@ flowchart TB
         C3[n8n/Automation]
     end
     
-    subgraph OpenWA["OpenWA Platform"]
+    subgraph Zetu["Zetu Platform"]
         subgraph API["API Layer"]
             REST[REST API<br/>NestJS]
             WS[WebSocket<br/>Real-time]
@@ -75,10 +75,10 @@ sequenceDiagram
 
 ## 3.2 Pluggable Architecture Philosophy
 
-OpenWA is designed with a **Pluggable Architecture** that allows infrastructure components to be swapped without changing application code. This enables flexible deployments ranging from minimal single-session bots to larger single-node, multi-session installs.
+Zetu is designed with a **Pluggable Architecture** that allows infrastructure components to be swapped without changing application code. This enables flexible deployments ranging from minimal single-session bots to larger single-node, multi-session installs.
 
 > **Note — single-instance:** the live WhatsApp engine layer is stateful and held in-process
-> (an in-memory `Map` in `SessionService`). OpenWA currently runs as **one API instance per
+> (an in-memory `Map` in `SessionService`). Zetu currently runs as **one API instance per
 > session-data volume**; horizontal scaling across multiple API replicas is a future design
 > (not implemented). See [13 - Horizontal Scaling](13-horizontal-scaling.md).
 
@@ -246,7 +246,7 @@ export interface IAdapterLifecycle {
 
 ### Dependency Injection Configuration
 
-OpenWA uses NestJS Dynamic Modules for adapter injection:
+Zetu uses NestJS Dynamic Modules for adapter injection:
 
 ```typescript
 // adapters/adapters.module.ts
@@ -897,7 +897,7 @@ flowchart LR
 ## 3.12 Engine Abstraction Layer
 
 > [!IMPORTANT]
-> Engine abstraction is critical to mitigate **R001: WhatsApp Protocol Changes** in Risk Management. OpenWA ships two production-ready engines selectable via `ENGINE_TYPE`: `whatsapp-web.js` (default, Chromium/Puppeteer-based) and `baileys` (browser-free, WebSocket/Noise protocol). With the abstraction layer, adding further engines requires no changes to application code.
+> Engine abstraction is critical to mitigate **R001: WhatsApp Protocol Changes** in Risk Management. Zetu ships two production-ready engines selectable via `ENGINE_TYPE`: `whatsapp-web.js` (default, Chromium/Puppeteer-based) and `baileys` (browser-free, WebSocket/Noise protocol). With the abstraction layer, adding further engines requires no changes to application code.
 
 ### Strategy Pattern for Engine
 
@@ -1256,13 +1256,13 @@ flowchart TB
 
 ## 3.13 Pluggable Adapters
 
-OpenWA uses the adapter pattern for infrastructure components that can be swapped per deployment needs. This allows users with limited resources to run OpenWA without heavyweight external dependencies.
+Zetu uses the adapter pattern for infrastructure components that can be swapped per deployment needs. This allows users with limited resources to run Zetu without heavyweight external dependencies.
 
 ### Adapter Overview
 
 ```mermaid
 flowchart TB
-    subgraph Core["OpenWA Core"]
+    subgraph Core["Zetu Core"]
         APP[Application Logic]
     end
 
@@ -1551,7 +1551,7 @@ export class StorageFactory {
 
 ### 3.13.2 Database Adapter
 
-OpenWA supports SQLite for lightweight deployments and PostgreSQL for high-volume production.
+Zetu supports SQLite for lightweight deployments and PostgreSQL for high-volume production.
 
 #### Database Comparison
 
@@ -1721,7 +1721,7 @@ export const getCacheConfig = async (
 
 ### 3.13.4 Deployment Profiles
 
-OpenWA provides several deployment profiles for different needs:
+Zetu provides several deployment profiles for different needs:
 
 ```mermaid
 flowchart LR

@@ -1,5 +1,5 @@
 /**
- * Injectable HTTP transport for the OpenWA SDK.
+ * Injectable HTTP transport for the Zetu SDK.
  *
  * The client never calls `globalThis.fetch` directly. Instead it accepts a
  * `FetchLike` implementation (defaulting to the global `fetch`). This makes the
@@ -10,7 +10,7 @@
  * @packageDocumentation
  */
 
-import { classifyApiError, OpenWAApiError, OpenWATimeoutError } from './errors.js';
+import { classifyApiError, ZetuApiError, ZetuTimeoutError } from './errors.js';
 
 /** Subset of the WHATWG `fetch` signature the SDK relies on. */
 export type FetchLike = typeof globalThis.fetch;
@@ -32,7 +32,7 @@ export interface RequestOptions {
 }
 
 export interface ClientConfig {
-  /** Base URL of the OpenWA API, e.g. `http://localhost:2785`. */
+  /** Base URL of the Zetu API, e.g. `http://localhost:2785`. */
   baseUrl: string;
   /** API key sent as `X-API-Key`. */
   apiKey: string;
@@ -68,9 +68,9 @@ export function buildUrl(baseUrl: string, path: string, query?: object): string 
 }
 
 /**
- * Perform a single request against the OpenWA API and return the parsed JSON
- * body (or `null` for 204). Throws a typed {@link OpenWAApiError} subclass on
- * non-2xx, or {@link OpenWATimeoutError} on timeout.
+ * Perform a single request against the Zetu API and return the parsed JSON
+ * body (or `null` for 204). Throws a typed {@link ZetuApiError} subclass on
+ * non-2xx, or {@link ZetuTimeoutError} on timeout.
  */
 export async function request<T>(
   config: Required<Omit<ClientConfig, 'fetch'>> & { fetch: FetchLike },
@@ -104,7 +104,7 @@ export async function request<T>(
   } catch (err) {
     clearTimeout(timer);
     if (err instanceof Error && err.name === 'AbortError') {
-      throw new OpenWATimeoutError(timeoutMs);
+      throw new ZetuTimeoutError(timeoutMs);
     }
     throw err;
   }
@@ -112,7 +112,7 @@ export async function request<T>(
 
   if (!res.ok) {
     const context = `${options.method} ${options.path}`;
-    const apiError = await OpenWAApiError.fromResponse(res, context);
+    const apiError = await ZetuApiError.fromResponse(res, context);
     throw classifyApiError(apiError.status, apiError.message, apiError.body, apiError.errorKind);
   }
 

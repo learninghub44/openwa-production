@@ -2,7 +2,7 @@
 
 ## 5.1 Overview
 
-OpenWA uses a database to store:
+Zetu uses a database to store:
 
 - Session configuration & state
 - Webhook configurations
@@ -12,7 +12,7 @@ OpenWA uses a database to store:
 
 ### Database Support
 
-OpenWA supports two database backends that can be selected at deployment time:
+Zetu supports two database backends that can be selected at deployment time:
 
 | Database       | Use Case                                    | Sessions | Horizontal Scaling |
 | -------------- | ------------------------------------------- | -------- | ------------------ |
@@ -33,11 +33,11 @@ OpenWA supports two database backends that can be selected at deployment time:
 
 ### Dual-Database Architecture
 
-OpenWA v0.2+ implements a **dual-database architecture** that separates boot configuration from user data:
+Zetu v0.2+ implements a **dual-database architecture** that separates boot configuration from user data:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        OpenWA Application                        │
+│                        Zetu Application                        │
 ├─────────────────────────────┬───────────────────────────────────┤
 │      Main DB (SQLite)       │        Data DB (Pluggable)        │
 │     Always ./data/main.db   │   SQLite or PostgreSQL (config)   │
@@ -66,7 +66,7 @@ OpenWA v0.2+ implements a **dual-database architecture** that separates boot con
 
 #### Pre-Bootstrap PostgreSQL Orchestration
 
-When using PostgreSQL Built-in mode, OpenWA automatically:
+When using PostgreSQL Built-in mode, Zetu automatically:
 
 1. Starts PostgreSQL container **before** NestJS bootstrap
 2. Waits for health check (max 60 seconds)
@@ -82,7 +82,7 @@ const app = await NestFactory.create(AppModule); // Then bootstrap
 
 #### Data Migration API
 
-OpenWA provides endpoints for migrating data between database types:
+Zetu provides endpoints for migrating data between database types:
 
 | Endpoint                 | Method | Description                          |
 | ------------------------ | ------ | ------------------------------------ |
@@ -109,7 +109,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 
 #### Cross-Database Date Portability
 
-To ensure date/time values work across both SQLite and PostgreSQL, OpenWA uses a `DateTransformer` that stores dates as ISO 8601 text strings:
+To ensure date/time values work across both SQLite and PostgreSQL, Zetu uses a `DateTransformer` that stores dates as ISO 8601 text strings:
 
 ```typescript
 // src/common/transformers/date.transformer.ts

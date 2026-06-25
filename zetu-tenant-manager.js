@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * OpenWA Tenant Manager CLI
+ * Zetu Tenant Manager CLI
  * Manages WhatsApp sessions and API keys per client.
  *
  * Usage:
- *   OPENWA_URL=https://your-openwa.onrender.com \
+ *   OPENWA_URL=https://your-zetu.onrender.com \
  *   OPENWA_MASTER_KEY=your_master_key \
  *   node tenant-manager.js
  */
 
-const BASE_URL = (process.env.OPENWA_URL || 'https://your-openwa.onrender.com').replace(/\/$/, '');
+const BASE_URL = (process.env.OPENWA_URL || 'https://your-zetu.onrender.com').replace(/\/$/, '');
 const MASTER_KEY = process.env.OPENWA_MASTER_KEY || '';
 
 const readline = require('readline');
@@ -138,7 +138,7 @@ async function main() {
     rl.close(); return;
   }
   console.log('\n╔════════════════════════════════╗');
-  console.log('║   OpenWA Tenant Manager        ║');
+  console.log('║   Zetu Tenant Manager        ║');
   console.log('╚════════════════════════════════╝');
   console.log(`  Server: ${BASE_URL}\n`);
   try {

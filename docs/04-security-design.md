@@ -404,12 +404,12 @@ const corsOptions = {
 
 ```mermaid
 sequenceDiagram
-    participant OW as OpenWA
+    participant OW as Zetu
     participant WH as Webhook Endpoint
     
     OW->>OW: Create payload
     OW->>OW: Sign with HMAC-SHA256
-    OW->>WH: POST + X-OpenWA-Signature
+    OW->>WH: POST + X-Zetu-Signature
     WH->>WH: Verify signature
     WH->>WH: Process if valid
     WH-->>OW: 200 OK
@@ -418,7 +418,7 @@ sequenceDiagram
 ### Signature Verification
 
 ```typescript
-// OpenWA: Generate signature
+// Zetu: Generate signature
 function signPayload(payload: object, secret: string): string {
   const hmac = crypto.createHmac('sha256', secret);
   hmac.update(JSON.stringify(payload));

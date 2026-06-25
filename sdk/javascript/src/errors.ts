@@ -1,7 +1,7 @@
 /**
- * Typed error hierarchy for the OpenWA SDK.
+ * Typed error hierarchy for the Zetu SDK.
  *
- * The OpenWA API returns NestJS-default errors of the shape:
+ * The Zetu API returns NestJS-default errors of the shape:
  *   `{ statusCode: number, message: string | string[], error: string }`
  * This module maps that to a typed, ergonomic error tree so callers can
  * `instanceof`-check or branch on `.status`.
@@ -10,10 +10,10 @@
  */
 
 /** Base class for every error thrown by the SDK. */
-export class OpenWAError extends Error {
+export class ZetuError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'OpenWAError';
+    this.name = 'ZetuError';
   }
 }
 
@@ -21,9 +21,9 @@ export class OpenWAError extends Error {
  * Thrown when the API responds with a non-2xx status. Carries the HTTP status
  * code and the parsed error body (or the raw text if the body was not JSON).
  *
- * Use the static {@link OpenWAApiError.fromResponse} factory in most cases.
+ * Use the static {@link ZetuApiError.fromResponse} factory in most cases.
  */
-export class OpenWAApiError extends OpenWAError {
+export class ZetuApiError extends ZetuError {
   /** HTTP status code (e.g. 400, 404, 409, 429, 501). */
   readonly status: number;
   /** Parsed JSON body if available, otherwise the raw response text. */
@@ -33,14 +33,14 @@ export class OpenWAApiError extends OpenWAError {
 
   constructor(message: string, status: number, body: unknown, errorKind?: string) {
     super(message);
-    this.name = 'OpenWAApiError';
+    this.name = 'ZetuApiError';
     this.status = status;
     this.body = body;
     this.errorKind = errorKind;
   }
 
-  /** Build an {@link OpenWAApiError} from a fetch Response, awaiting its body. */
-  static async fromResponse(res: Response, context: string): Promise<OpenWAApiError> {
+  /** Build an {@link ZetuApiError} from a fetch Response, awaiting its body. */
+  static async fromResponse(res: Response, context: string): Promise<ZetuApiError> {
     let body: unknown = undefined;
     const text = await res.text().catch(() => '');
     if (text) {
@@ -52,52 +52,52 @@ export class OpenWAApiError extends OpenWAError {
     }
     const env = isNestEnvelope(body) ? body : undefined;
     const messageText = describeMessage(env?.message ?? body ?? res.statusText);
-    const message = `OpenWA API ${res.status} ${res.statusText} — ${context}: ${messageText}`;
-    return new OpenWAApiError(message, res.status, body, env?.error);
+    const message = `Zetu API ${res.status} ${res.statusText} — ${context}: ${messageText}`;
+    return new ZetuApiError(message, res.status, body, env?.error);
   }
 }
 
 /** 401 Unauthorized — missing or invalid API key. */
-export class OpenWAAuthError extends OpenWAApiError {}
+export class ZetuAuthError extends ZetuApiError {}
 /** 403 Forbidden — the API key's role is insufficient for this endpoint. */
-export class OpenWAForbiddenError extends OpenWAApiError {}
+export class ZetuForbiddenError extends ZetuApiError {}
 /** 404 Not Found. */
-export class OpenWANotFoundError extends OpenWAApiError {}
+export class ZetuNotFoundError extends ZetuApiError {}
 /** 409 Conflict — typically an {@link EngineNotReadyError} from the backend. */
-export class OpenWAConflictError extends OpenWAApiError {}
+export class ZetuConflictError extends ZetuApiError {}
 /** 429 Too Many Requests — rate limited. */
-export class OpenWARateLimitError extends OpenWAApiError {}
+export class ZetuRateLimitError extends ZetuApiError {}
 /** 501 Not Implemented — the active engine does not support this operation. */
-export class OpenWANotImplementedError extends OpenWAApiError {}
+export class ZetuNotImplementedError extends ZetuApiError {}
 
 /** Thrown when a request exceeds the configured timeout. */
-export class OpenWATimeoutError extends OpenWAError {
+export class ZetuTimeoutError extends ZetuError {
   constructor(timeoutMs: number) {
     super(`Request timed out after ${timeoutMs}ms`);
-    this.name = 'OpenWATimeoutError';
+    this.name = 'ZetuTimeoutError';
   }
 }
 
 /**
- * Construct the most specific {@link OpenWAApiError} subclass for a status code.
- * Falls back to the generic {@link OpenWAApiError} for unmapped statuses.
+ * Construct the most specific {@link ZetuApiError} subclass for a status code.
+ * Falls back to the generic {@link ZetuApiError} for unmapped statuses.
  */
-export function classifyApiError(status: number, message: string, body: unknown, errorKind?: string): OpenWAApiError {
+export function classifyApiError(status: number, message: string, body: unknown, errorKind?: string): ZetuApiError {
   switch (status) {
     case 401:
-      return new OpenWAAuthError(message, status, body, errorKind);
+      return new ZetuAuthError(message, status, body, errorKind);
     case 403:
-      return new OpenWAForbiddenError(message, status, body, errorKind);
+      return new ZetuForbiddenError(message, status, body, errorKind);
     case 404:
-      return new OpenWANotFoundError(message, status, body, errorKind);
+      return new ZetuNotFoundError(message, status, body, errorKind);
     case 409:
-      return new OpenWAConflictError(message, status, body, errorKind);
+      return new ZetuConflictError(message, status, body, errorKind);
     case 429:
-      return new OpenWARateLimitError(message, status, body, errorKind);
+      return new ZetuRateLimitError(message, status, body, errorKind);
     case 501:
-      return new OpenWANotImplementedError(message, status, body, errorKind);
+      return new ZetuNotImplementedError(message, status, body, errorKind);
     default:
-      return new OpenWAApiError(message, status, body, errorKind);
+      return new ZetuApiError(message, status, body, errorKind);
   }
 }
 

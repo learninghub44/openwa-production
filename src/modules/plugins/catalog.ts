@@ -1,4 +1,4 @@
-// Remote plugin catalog: the shape of an entry in the OpenWA-plugins `plugins.json`, and the pure
+// Remote plugin catalog: the shape of an entry in the Zetu-plugins `plugins.json`, and the pure
 // logic that annotates each entry with install state relative to what is currently loaded.
 
 /** One entry as published in the remote catalog (plugins.json). Extra fields are tolerated. */
@@ -12,8 +12,8 @@ export interface CatalogEntry {
   author?: string;
   license?: string;
   keywords?: string[];
-  minOpenWAVersion?: string;
-  testedOpenWAVersion?: string;
+  minZetuVersion?: string;
+  testedZetuVersion?: string;
   releasedAt?: string;
   repoUrl?: string;
   homepage?: string;

@@ -96,4 +96,4 @@ VITE_WS_URL=http://localhost:2785
 
 ## 📄 License
 
-MIT License - Part of the [OpenWA](https://github.com/rmyndharis/OpenWA) project.
+MIT License - Part of the [OpenWA](https://github.com/learninghub44/OpenWA) project.

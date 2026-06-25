@@ -1,18 +1,18 @@
 /**
- * OpenWA SDK — drop into any of your Node.js projects.
+ * Zetu SDK — drop into any of your Node.js projects.
  *
  * Usage:
- *   const wa = require('./openwa-sdk');
+ *   const wa = require('./zetu-sdk');
  *   await wa.sendText('session-id', '0712345678', 'Hello!');
  *
  * Or custom instance:
- *   const { OpenWAClient } = require('./openwa-sdk');
- *   const wa = new OpenWAClient('https://your-openwa.onrender.com', 'owa_k1_...');
+ *   const { ZetuClient } = require('./zetu-sdk');
+ *   const wa = new ZetuClient('https://your-zetu.onrender.com', 'owa_k1_...');
  */
 
-class OpenWAClient {
+class ZetuClient {
   constructor(
-    url = process.env.OPENWA_URL || 'https://your-openwa.onrender.com',
+    url = process.env.OPENWA_URL || 'https://your-zetu.onrender.com',
     apiKey = process.env.OPENWA_API_KEY || ''
   ) {
     this.url = url.replace(/\/$/, '');
@@ -26,7 +26,7 @@ class OpenWAClient {
       body: body ? JSON.stringify(body) : undefined,
     });
     const text = await res.text();
-    if (!res.ok) throw new Error(`OpenWA ${res.status} ${path}: ${text}`);
+    if (!res.ok) throw new Error(`Zetu ${res.status} ${path}: ${text}`);
     return text ? JSON.parse(text) : null;
   }
 
@@ -108,8 +108,8 @@ class OpenWAClient {
   health() { return this._req('GET', '/health/ready'); }
 }
 
-module.exports = new OpenWAClient();
-module.exports.OpenWAClient = OpenWAClient;
+module.exports = new ZetuClient();
+module.exports.ZetuClient = ZetuClient;
 
 /*
 ─────────────────────────────────────────────────────────────
@@ -117,7 +117,7 @@ USAGE EXAMPLES FOR YOUR PROJECTS
 ─────────────────────────────────────────────────────────────
 
 // ── CBC School ERP ──────────────────────────────────────────
-const wa = require('./openwa-sdk');
+const wa = require('./zetu-sdk');
 
 // One-off fee reminder
 await wa.sendText('school-erp', '0712345678', 'Fee balance: KES 5,000. Due 30 June.');
@@ -140,8 +140,8 @@ await wa.sendBulk('school-erp', [
 ]);
 
 // ── House Hunt Kisii ────────────────────────────────────────
-const { OpenWAClient } = require('./openwa-sdk');
-const wa = new OpenWAClient(process.env.OPENWA_URL, process.env.OPENWA_API_KEY);
+const { ZetuClient } = require('./zetu-sdk');
+const wa = new ZetuClient(process.env.OPENWA_URL, process.env.OPENWA_API_KEY);
 
 await wa.sendMedia('househunt-wa', buyer.phone,
   property.images[0],

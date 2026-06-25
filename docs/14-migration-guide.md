@@ -2,7 +2,7 @@
 
 ## 14.1 Overview
 
-This document provides a comprehensive guide for migrating OpenWA, including:
+This document provides a comprehensive guide for migrating Zetu, including:
 
 - Database migration (SQLite → PostgreSQL)
 - Version upgrades (v0.1 → v0.2 → v1.0)
@@ -90,7 +90,7 @@ flowchart TD
 
 ### API-Based Migration (Recommended for v0.2+)
 
-OpenWA v0.2+ includes built-in migration API endpoints that leverage the **Dual-Database Architecture**:
+Zetu v0.2+ includes built-in migration API endpoints that leverage the **Dual-Database Architecture**:
 
 ```bash
 # Step 1: Export all Data DB tables
@@ -115,7 +115,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 > [!NOTE]
 > **Dual-Database Architecture**
 >
-> OpenWA separates databases:
+> Zetu separates databases:
 >
 > - **Main DB** (SQLite): API keys, audit logs - never migrated, always local
 > - **Data DB** (Pluggable): Sessions, webhooks, messages - this is what gets migrated
@@ -145,7 +145,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 
 ### Storage Migration (Local ↔ S3/MinIO)
 
-OpenWA v0.2+ supports migrating media files between storage backends:
+Zetu v0.2+ supports migrating media files between storage backends:
 
 ```bash
 # Step 1: Check current storage file count
@@ -184,7 +184,7 @@ curl -X POST 'http://localhost:2785/api/infra/storage/import' \
 
 ### Redis Migration (Cache)
 
-Redis in OpenWA is used **only for caching** with TTL-based expiration. Cache data is ephemeral and automatically regenerates from the database.
+Redis in Zetu is used **only for caching** with TTL-based expiration. Cache data is ephemeral and automatically regenerates from the database.
 
 **No migration API needed** - just change configuration:
 
@@ -424,7 +424,7 @@ migrateSqliteToPostgres(config)
 ### Step-by-Step Migration
 
 ```bash
-# Step 1: Stop OpenWA
+# Step 1: Stop Zetu
 docker compose down
 
 # Step 2: Backup current data
@@ -733,7 +733,7 @@ breaking_changes:
 
 set -e
 
-echo "🚀 Upgrading OpenWA v0.1.x → v0.2.x"
+echo "🚀 Upgrading Zetu v0.1.x → v0.2.x"
 
 # 1. Backup
 echo "📦 Creating backup..."
@@ -751,13 +751,13 @@ echo "🔄 Running migrations..."
 docker run --rm \
   -v $(pwd)/data:/app/data \
   -e DATABASE_URL=sqlite:///app/data/openwa.db \
-  ghcr.io/rmyndharis/openwa:0.2.0 \
+  ghcr.io/learninghub44/openwa:0.2.0 \
   npm run migration:run:prod   # the prod image strips ts-node/TS source — use :prod (M13)
 
 # 4. Migrate configuration
 echo "⚙️ Migrating configuration..."
 cat > .env.new << 'EOF'
-# OpenWA v0.2.x Configuration
+# Zetu v0.2.x Configuration
 
 # Database (unchanged if using SQLite)
 DATABASE_ADAPTER=sqlite
@@ -833,10 +833,10 @@ breaking_changes:
 
 set -e
 
-echo "🚀 Upgrading OpenWA v0.2.x → v1.0.0"
+echo "🚀 Upgrading Zetu v0.2.x → v1.0.0"
 
 # Pre-flight checks
-CURRENT_VERSION=$(docker inspect ghcr.io/rmyndharis/openwa --format '{{.Config.Labels.version}}' 2>/dev/null || echo "unknown")
+CURRENT_VERSION=$(docker inspect ghcr.io/learninghub44/openwa --format '{{.Config.Labels.version}}' 2>/dev/null || echo "unknown")
 echo "Current version: $CURRENT_VERSION"
 
 # 1. Comprehensive backup
@@ -889,7 +889,7 @@ echo "🔄 Running migrations..."
 docker run --rm \
   -v $(pwd)/data:/app/data \
   --env-file .env \
-  ghcr.io/rmyndharis/openwa:1.0.0 \
+  ghcr.io/learninghub44/openwa:1.0.0 \
   npm run migration:run
 
 # 6. Migrate webhooks to new format
@@ -898,7 +898,7 @@ docker run --rm \
   -v $(pwd)/data:/app/data \
   -v "$BACKUP_DIR/webhooks.json:/tmp/webhooks.json" \
   --env-file .env \
-  ghcr.io/rmyndharis/openwa:1.0.0 \
+  ghcr.io/learninghub44/openwa:1.0.0 \
   npm run cli -- migrate-webhooks /tmp/webhooks.json
 
 # 7. Start new version
