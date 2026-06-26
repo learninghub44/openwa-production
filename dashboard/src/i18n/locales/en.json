@@ -75,6 +75,7 @@
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
     "tenants": "Tenants",
+    "billing": "Billing",
     "logs": "Logs"
   },
   "chats": {

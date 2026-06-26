@@ -21,6 +21,7 @@ const MessageTester = lazy(() => import('./pages/MessageTester').then(m => ({ de
 const Infrastructure = lazy(() => import('./pages/Infrastructure').then(m => ({ default: m.Infrastructure })));
 const Plugins = lazy(() => import('./pages/Plugins'));
 const Tenants = lazy(() => import('./pages/Tenants').then(m => ({ default: m.Tenants })));
+const Billing = lazy(() => import('./pages/Billing').then(m => ({ default: m.Billing })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -110,6 +111,7 @@ function AppContent() {
             <Route path="templates" element={<Templates />} />
             {role === 'admin' && <Route path="api-keys" element={<ApiKeys />} />}
             {role === 'admin' && <Route path="tenants" element={<Tenants />} />}
+            {role === 'admin' && <Route path="billing" element={<Billing />} />}
             <Route path="logs" element={<Logs />} />
             <Route path="message-tester" element={<MessageTester />} />
             <Route path="infrastructure" element={<Infrastructure />} />

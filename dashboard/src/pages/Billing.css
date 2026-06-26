@@ -1,0 +1,296 @@
+.billing-page {
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Stats strip ──────────────────────────────────────────────────────────── */
+
+.billing-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--bg-white, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 0.5rem);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.stat-card.green  { border-left: 3px solid #22c55e; }
+.stat-card.orange { border-left: 3px solid #f97316; }
+.stat-card.blue   { border-left: 3px solid #3b82f6; }
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* ── Filter bar ────────────────────────────────────────────────────────────── */
+
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 999px;
+  background: var(--bg-white, #fff);
+  color: var(--text-secondary, #64748b);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-pill:hover { border-color: var(--primary, #25d366); color: var(--primary, #25d366); }
+.filter-pill.active {
+  background: var(--primary, #25d366);
+  border-color: var(--primary, #25d366);
+  color: #fff;
+}
+.pill-count {
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
+}
+.filter-pill.active .pill-count { background: rgba(255,255,255,0.25); }
+
+/* ── Table ─────────────────────────────────────────────────────────────────── */
+
+.sub-table-wrap {
+  background: var(--bg-white, #fff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 0.5rem);
+  overflow: hidden;
+}
+
+.sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.sub-table th {
+  text-align: left;
+  padding: 0.875rem 1rem;
+  background: var(--bg-light, #f8fafc);
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.sub-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  color: var(--text-primary, #1e293b);
+  vertical-align: middle;
+}
+
+.sub-table tr:last-child td { border-bottom: none; }
+.sub-table tr:hover td { background: var(--bg-light, #f8fafc); }
+
+/* ── Client cell ──────────────────────────────────────────────────────────── */
+
+.client-cell { display: flex; flex-direction: column; gap: 0.125rem; }
+.client-name { font-weight: 600; }
+.client-email { font-size: 0.78rem; color: var(--text-muted, #94a3b8); }
+
+/* ── Plan badges ──────────────────────────────────────────────────────────── */
+
+.plan-badge {
+  display: inline-block;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.badge-starter    { background: #f1f5f9; color: #475569; }
+.badge-growth     { background: #eff6ff; color: #2563eb; }
+.badge-pro        { background: #f0fdf4; color: #16a34a; }
+.badge-enterprise { background: #faf5ff; color: #7c3aed; }
+
+/* ── Status badges ────────────────────────────────────────────────────────── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.status-active    { background: #dcfce7; color: #15803d; }
+.status-grace     { background: #fff7ed; color: #c2410c; }
+.status-pending   { background: #fef9c3; color: #a16207; }
+.status-suspended { background: #fee2e2; color: #b91c1c; }
+.status-cancelled { background: #f1f5f9; color: #64748b; }
+
+/* ── Period cell ──────────────────────────────────────────────────────────── */
+
+.period-cell { display: flex; align-items: center; gap: 0.5rem; }
+.days-chip {
+  font-size: 0.72rem;
+  padding: 0.125rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-light, #f8fafc);
+  color: var(--text-muted, #94a3b8);
+  border: 1px solid var(--border, #e2e8f0);
+}
+.days-chip.urgent { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+/* ── Row actions ──────────────────────────────────────────────────────────── */
+
+.row-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius, 0.5rem);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.action-btn.extend {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+.action-btn.extend:hover { background: #dbeafe; }
+.action-btn.suspend {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+.action-btn.suspend:hover { background: #fecaca; }
+
+/* ── States ───────────────────────────────────────────────────────────────── */
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.loading-state p, .empty-state p { margin: 0; font-size: 0.9375rem; }
+.muted { color: var(--text-muted, #94a3b8); }
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn-primary {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--primary, #25d366);
+  color: white;
+  border: none;
+  border-radius: var(--radius, 0.5rem);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--primary-hover, #1ab954); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-ghost {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 0.5rem);
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--text-secondary, #64748b); }
+
+.icon-btn { padding: 0.5rem; }
+
+/* ── Modal ─────────────────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-box {
+  background: var(--bg-white, #fff);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  width: 360px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 { margin: 0 0 0.25rem; font-size: 1.125rem; }
+.modal-sub { color: var(--text-muted, #94a3b8); font-size: 0.875rem; margin: 0 0 1.25rem; }
+
+.form-label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+.days-grid {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+
+.day-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--border, #e2e8f0);
+  border-radius: var(--radius, 0.5rem);
+  background: var(--bg-white, #fff);
+  color: var(--text-secondary, #64748b);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.day-btn:hover { border-color: var(--primary, #25d366); }
+.day-btn.selected {
+  border-color: var(--primary, #25d366);
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+/* ── Spin ─────────────────────────────────────────────────────────────────── */
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .billing-stats { grid-template-columns: repeat(2, 1fr); }
+  .sub-table { font-size: 0.8rem; }
+}

@@ -132,6 +132,21 @@ async function bootstrap() {
   // Cap request body size (DoS hardening). Media sends carry base64 in the JSON body,
   // so the default is generous; tune with BODY_SIZE_LIMIT.
   const bodyLimit = resolveBodyLimit(process.env.BODY_SIZE_LIMIT);
+
+  // Capture rawBody for Paystack webhook HMAC-SHA512 signature verification.
+  // The /api/billing/webhook route needs the exact raw bytes before any JSON parsing.
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path === '/api/billing/webhook') {
+      json({
+        limit: bodyLimit,
+        verify: (r: Request & { rawBody?: Buffer }, _res: Response, buf: Buffer) => {
+          r.rawBody = buf;
+        },
+      })(req, res, next);
+    } else {
+      next();
+    }
+  });
   app.use(json({ limit: bodyLimit }));
   app.use(urlencoded({ extended: true, limit: bodyLimit }));
 

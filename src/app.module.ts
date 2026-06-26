@@ -34,6 +34,7 @@ import { PluginsModule } from './core/plugins';
 import { PluginsApiModule } from './modules/plugins/plugins.module';
 import { AgentToolsModule } from './core/agent-tools/agent-tools.module';
 import { TenantModule } from './modules/tenant/tenant.module';
+import { BillingModule } from './modules/billing/billing.module';
 
 // Only import QueueModule if explicitly enabled to avoid Redis connection errors
 const queueModules: Array<Type | DynamicModule> = [];
@@ -77,7 +78,14 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
       rootPath: DASHBOARD_DIST,
       // Let Nest own these so unknown API/socket routes return real 404s/JSON rather
       // than the SPA index.html fallback (Express 5 / path-to-regexp v8 wildcard syntax).
-      exclude: ['/api/{*splat}', '/socket.io/{*splat}', '/mcp', '/mcp/{*splat}'],
+      exclude: ['/api/{*splat}', '/socket.io/{*splat}', '/mcp', '/mcp/{*splat}', '/portal', '/portal/{*splat}'],
+    }),
+    // Serve the client-facing portal SPA at /portal — built from dashboard/portal.html
+    ServeStaticModule.forRoot({
+      rootPath: DASHBOARD_DIST,
+      serveRoot: '/portal',
+      renderPath: 'portal.html',
+      exclude: ['/api/{*splat}'],
     }),
   );
 }
@@ -109,6 +117,7 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
             __dirname + '/modules/auth/**/*.entity{.ts,.js}',
             __dirname + '/modules/audit/**/*.entity{.ts,.js}',
             __dirname + '/modules/tenant/**/*.entity{.ts,.js}',
+            __dirname + '/modules/billing/**/*.entity{.ts,.js}',
           ],
           // Dedicated migrations dir for the main connection only (must NOT run the
           // data-connection migrations, which target session/webhook/message tables).
@@ -237,6 +246,7 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
     PluginsApiModule, // Phase 5: Plugins API
     AgentToolsModule, // Agent-invocable tool registry (protocol-neutral)
     TenantModule, // Multi-tenant provisioning (ADMIN-only)
+    BillingModule, // Paystack billing + client portal
     ...mcpModules, // MCP Streamable-HTTP server (opt-in via MCP_ENABLED=true)
     ...serveStaticModules, // Bundled dashboard SPA (production single-port setup)
   ],
