@@ -5,7 +5,7 @@
     "buildCommand": "npm ci --include=dev && npm run build:all"
   },
   "deploy": {
-    "startCommand": "node dist/main",
+    "startCommand": "npm run migration:run:prod && npm run migration:run:main:prod && node dist/main",
     "healthcheckPath": "/api/health/ready",
     "healthcheckTimeout": 60,
     "restartPolicyType": "ON_FAILURE",

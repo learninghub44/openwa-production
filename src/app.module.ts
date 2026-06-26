@@ -99,32 +99,56 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
       validate: validateEnv,
     }),
 
-    // Main Database (always SQLite - boot config)
+    // Main Database — SQLite (default/dev) or PostgreSQL (MAIN_DATABASE_TYPE=postgres)
+    // On Railway: set MAIN_DATABASE_TYPE=postgres and MAIN_DATABASE_URL=<Railway Postgres URL>
     TypeOrmModule.forRootAsync({
       name: 'main',
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        // Default ON for zero-config first boot. When disabled
-        // (MAIN_DATABASE_SYNCHRONIZE=false), the main-owned migrations create the
-        // api_keys/audit_logs schema instead — never both at once.
         const synchronize = configService.get<boolean>('database.synchronize', true);
-        return {
-          name: 'main',
-          type: 'sqlite' as const,
-          database: configService.get<string>('database.database', './data/main.sqlite'),
+        const mainDbType = (process.env.MAIN_DATABASE_TYPE ?? 'sqlite') as 'sqlite' | 'postgres';
+
+        const baseConfig = {
+          name: 'main' as const,
           entities: [
             __dirname + '/modules/auth/**/*.entity{.ts,.js}',
             __dirname + '/modules/audit/**/*.entity{.ts,.js}',
             __dirname + '/modules/tenant/**/*.entity{.ts,.js}',
             __dirname + '/modules/billing/**/*.entity{.ts,.js}',
           ],
-          // Dedicated migrations dir for the main connection only (must NOT run the
-          // data-connection migrations, which target session/webhook/message tables).
           migrations: [__dirname + '/database/migrations-main/*{.ts,.js}'],
           synchronize,
           migrationsRun: !synchronize,
           logging: configService.get<boolean>('database.logging', false),
+        };
+
+        if (mainDbType === 'postgres') {
+          const mainUrl = process.env.MAIN_DATABASE_URL;
+          return {
+            ...baseConfig,
+            type: 'postgres' as const,
+            ...(mainUrl
+              ? { url: mainUrl }
+              : {
+                  host: process.env.MAIN_DATABASE_HOST || 'localhost',
+                  port: parseInt(process.env.MAIN_DATABASE_PORT || '5432', 10),
+                  username: process.env.MAIN_DATABASE_USERNAME,
+                  password: process.env.MAIN_DATABASE_PASSWORD,
+                  database: process.env.MAIN_DATABASE_NAME || 'zetu_main',
+                }),
+            ssl: process.env.MAIN_DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+            extra: { max: 5 },
+            synchronize: false, // never auto-sync Postgres — use migrations
+            migrationsRun: true,
+          };
+        }
+
+        // SQLite (default)
+        return {
+          ...baseConfig,
+          type: 'sqlite' as const,
+          database: configService.get<string>('database.database', './data/main.sqlite'),
         };
       },
     }),

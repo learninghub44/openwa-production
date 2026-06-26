@@ -1,32 +1,59 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 
-// Load environment variables (mirrors data-source.ts).
 config();
 
 /**
- * Standalone TypeORM CLI DataSource for the MAIN connection (auth + audit).
+ * Standalone TypeORM CLI DataSource for the MAIN connection (auth + audit + tenant + billing).
  *
- * The app runs the main connection as a separate, ALWAYS-SQLite connection (app.module.ts), distinct
- * from the pluggable data connection. The default data-source.ts CLI only manages the data
- * connection's migrations, so without this the CLI could not run/generate the main-owned migrations
- * (migrations-main) — which matters the moment boot auto-migration is turned off
- * (MAIN_DATABASE_SYNCHRONIZE=false), where the schema must be managed via the CLI instead.
+ * Supports both SQLite (local/dev) and PostgreSQL (Railway/production).
  *
- * Mirrors the runtime main connection exactly: SQLite at ./data/main.sqlite, auth/audit entities,
- * migrations-main. synchronize is always false here — the CLI manages schema via migrations.
+ * Railway setup:
+ *   MAIN_DATABASE_TYPE=postgres
+ *   MAIN_DATABASE_URL=postgresql://... (from Railway Postgres plugin)
  *
- * Usage: `npm run migration:run:main` (dev) / `migration:run:main:prod` (compiled).
+ * Usage:
+ *   npm run migration:run:main       (dev — SQLite)
+ *   npm run migration:run:main:prod  (prod — compiled JS, reads env)
  */
-const mainDataSource = new DataSource({
-  type: 'sqlite',
-  // Hardcoded to match the runtime main path (configuration.ts), so the CLI and the app never target
-  // different main databases.
-  database: './data/main.sqlite',
-  entities: [__dirname + '/../modules/auth/**/*.entity{.ts,.js}', __dirname + '/../modules/audit/**/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/migrations-main/*{.ts,.js}'],
-  synchronize: false,
-  logging: process.env.DATABASE_LOGGING === 'true',
-});
+
+const mainDbType = (process.env.MAIN_DATABASE_TYPE ?? 'sqlite') as 'sqlite' | 'postgres';
+
+const ENTITIES = [
+  __dirname + '/../modules/auth/**/*.entity{.ts,.js}',
+  __dirname + '/../modules/audit/**/*.entity{.ts,.js}',
+  __dirname + '/../modules/tenant/**/*.entity{.ts,.js}',
+  __dirname + '/../modules/billing/**/*.entity{.ts,.js}',
+];
+
+const MIGRATIONS = [__dirname + '/migrations-main/*{.ts,.js}'];
+
+const mainDataSource =
+  mainDbType === 'postgres'
+    ? new DataSource({
+        type: 'postgres',
+        ...(process.env.MAIN_DATABASE_URL
+          ? { url: process.env.MAIN_DATABASE_URL }
+          : {
+              host: process.env.MAIN_DATABASE_HOST || 'localhost',
+              port: parseInt(process.env.MAIN_DATABASE_PORT || '5432', 10),
+              username: process.env.MAIN_DATABASE_USERNAME,
+              password: process.env.MAIN_DATABASE_PASSWORD,
+              database: process.env.MAIN_DATABASE_NAME || 'zetu_main',
+            }),
+        ssl: process.env.MAIN_DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+        entities: ENTITIES,
+        migrations: MIGRATIONS,
+        synchronize: false,
+        logging: process.env.DATABASE_LOGGING === 'true',
+      })
+    : new DataSource({
+        type: 'sqlite',
+        database: process.env.MAIN_DATABASE_NAME || './data/main.sqlite',
+        entities: ENTITIES,
+        migrations: MIGRATIONS,
+        synchronize: false,
+        logging: process.env.DATABASE_LOGGING === 'true',
+      });
 
 export default mainDataSource;

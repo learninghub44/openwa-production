@@ -117,6 +117,13 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
   // awaited hook and orphan an engine the lifecycle could never destroy.
   private initializingSessions: Set<string> = new Set();
 
+  // Watchdog: periodic timer that detects FAILED sessions and auto-recovers them.
+  // Covers the case where Baileys exhausts its internal reconnect budget and marks
+  // the session FAILED — without a watchdog the session would stay dead until a
+  // manual restart or server reboot.
+  private watchdogTimer?: ReturnType<typeof setInterval>;
+  private static readonly WATCHDOG_INTERVAL_MS = 2 * 60 * 1000; // every 2 minutes
+
   // Serializes the read-modify-write of a message's reactions map per `${sessionId}:${waMessageId}`,
   // so two concurrent reaction events on the same message don't clobber each other (both read the
   // same snapshot, both full-row save, last writer wins). Entries are deleted once their chain drains.
@@ -140,11 +147,16 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
    * because the engines are not running yet after restart
    */
   async onModuleInit(): Promise<void> {
+    // Reset active-state sessions to DISCONNECTED (engines aren't running yet after restart).
+    // Also reset FAILED sessions — on Railway a hard container kill leaves sessions as FAILED
+    // because there's no graceful shutdown signal. Resetting them here means onApplicationBootstrap
+    // and the watchdog can restart them (both filter on DISCONNECTED | FAILED).
     const activeStatuses = [
       SessionStatus.READY,
       SessionStatus.INITIALIZING,
       SessionStatus.QR_READY,
       SessionStatus.AUTHENTICATING,
+      SessionStatus.FAILED,
     ];
 
     const result = await this.sessionRepository.update(
@@ -153,7 +165,7 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
     );
 
     if (result.affected && result.affected > 0) {
-      this.logger.log(`Reset ${result.affected} session(s) to disconnected on startup`, {
+      this.logger.log(`Reset ${result.affected} session(s) to DISCONNECTED on startup`, {
         action: 'startup_reset',
         affected: result.affected,
       });
@@ -163,18 +175,19 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
   async onApplicationBootstrap(): Promise<void> {
     if (process.env.AUTO_START_SESSIONS !== 'true') return;
 
-    // Multi-tenant mode: restart ALL disconnected sessions that belong to a tenant
-    // (identified by tenantId in config) OR that were previously authenticated (phone set).
-    // This ensures every tenant's session comes back online after a server restart without
-    // manual intervention.
-    const allDisconnected = await this.sessionRepository.find({
-      where: { status: SessionStatus.DISCONNECTED },
+    // Multi-tenant mode: restart ALL sessions that belong to a tenant or were previously
+    // authenticated. Critically: include FAILED sessions too — on Railway/cloud deployments a
+    // container kill lands sessions as FAILED (not DISCONNECTED) because there's no graceful
+    // shutdown. Without this, FAILED sessions are stuck forever until manually restarted.
+    const { In: InOp } = await import('typeorm');
+    const allCandidates = await this.sessionRepository.find({
+      where: { status: InOp([SessionStatus.DISCONNECTED, SessionStatus.FAILED]) },
     });
 
     // A session should be auto-restarted if:
     //  (a) it is a tenant-provisioned session (has tenantId in config), OR
     //  (b) it was previously authenticated (phone is set — legacy behaviour)
-    const sessions = allDisconnected.filter(s => {
+    const sessions = allCandidates.filter(s => {
       const cfg = s.config as Record<string, unknown> | null;
       return cfg?.tenantId || s.phone !== null;
     });
@@ -216,9 +229,85 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
         await this.delay(2000);
       }
     }
+
+    // Start the session watchdog — recovers FAILED sessions automatically every 2 minutes.
+    // This handles Baileys exhausting its internal reconnect budget (MAX_RECONNECT_ATTEMPTS)
+    // and marking a session FAILED. Without a watchdog, that session stays dead indefinitely.
+    this.startWatchdog();
+  }
+
+  /**
+   * Session watchdog: runs every 2 minutes and restarts any FAILED sessions that:
+   * (a) are tenant-provisioned, or (b) were previously authenticated (phone set).
+   * This provides resilience against transient network failures on Railway / cloud deployments
+   * where Baileys exhausts its backoff budget and gives up.
+   */
+  private startWatchdog(): void {
+    if (!process.env.AUTO_START_SESSIONS || process.env.AUTO_START_SESSIONS !== 'true') return;
+
+    this.watchdogTimer = setInterval(() => {
+      void this.runWatchdogCycle().catch(err => {
+        this.logger.warn('Watchdog cycle error', { error: String(err) });
+      });
+    }, SessionService.WATCHDOG_INTERVAL_MS);
+
+    this.logger.log('Session watchdog started', {
+      intervalMs: SessionService.WATCHDOG_INTERVAL_MS,
+      action: 'watchdog_start',
+    });
+  }
+
+  private async runWatchdogCycle(): Promise<void> {
+    const { In: InOp } = await import('typeorm');
+    const failedSessions = await this.sessionRepository.find({
+      where: { status: InOp([SessionStatus.FAILED, SessionStatus.DISCONNECTED]) },
+    });
+
+    const recoverable = failedSessions.filter(s => {
+      // Skip sessions currently being handled by the reconnect scheduler or actively stopping
+      if (this.reconnectStates.has(s.id)) return false;
+      if (this.stoppingSessions.has(s.id)) return false;
+      if (this.initializingSessions.has(s.id)) return false;
+      // Only recover tenant sessions or previously authenticated sessions
+      const cfg = s.config as Record<string, unknown> | null;
+      return cfg?.tenantId || s.phone !== null;
+    });
+
+    if (recoverable.length === 0) return;
+
+    this.logger.log(`Watchdog: recovering ${recoverable.length} FAILED/DISCONNECTED session(s)`, {
+      action: 'watchdog_cycle',
+      count: recoverable.length,
+    });
+
+    for (const session of recoverable) {
+      try {
+        // Clear the error state so start() doesn't see a "live engine" guard block
+        this.sessionErrors.delete(session.id);
+        await this.start(session.id);
+        this.logger.log(`Watchdog: recovered session ${session.name}`, {
+          sessionId: session.id,
+          action: 'watchdog_recovered',
+        });
+      } catch (err) {
+        this.logger.warn(`Watchdog: failed to recover session ${session.name}`, {
+          sessionId: session.id,
+          error: String(err),
+          action: 'watchdog_recovery_failed',
+        });
+      }
+      // Brief pause between recoveries to avoid overwhelming the engine
+      await this.delay(3000);
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
+    // Stop watchdog
+    if (this.watchdogTimer) {
+      clearInterval(this.watchdogTimer);
+      this.watchdogTimer = undefined;
+    }
+
     // Stop reconnect timers FIRST so nothing reschedules mid-teardown, and so this always runs even
     // if an engine.destroy() below hangs or throws.
     for (const [, state] of this.reconnectStates) {

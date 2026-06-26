@@ -107,7 +107,7 @@ function createBaileysLogger(): BaileysLogger {
 }
 
 export class BaileysAdapter implements IWhatsAppEngine {
-  private static readonly MAX_RECONNECT_ATTEMPTS = 5;
+  private static readonly MAX_RECONNECT_ATTEMPTS = 15; // Increased from 5 — Railway has transient network drops
 
   private readonly logger = createLogger('BaileysAdapter');
   // Bound concurrent inbound media downloads: each materialises a full decrypted buffer in heap, so an
