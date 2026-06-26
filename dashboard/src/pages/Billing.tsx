@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard, RefreshCw, Ban, Calendar, CheckCircle2,
-  Clock, AlertTriangle, XCircle, ChevronDown,
+  Clock, AlertTriangle, XCircle,
 } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../components/Toast';
@@ -80,10 +80,10 @@ function ExtendModal({
         method: 'PUT',
         body: JSON.stringify({ days }),
       });
-      addToast({ type: 'success', message: `Extended by ${days} days` });
+      addToast({ type: 'success', title: 'Extended', message: `Extended by ${days} days` });
       onSuccess();
     } catch (e) {
-      addToast({ type: 'error', message: String(e) });
+      addToast({ type: 'error', title: 'Error', message: String(e) });
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ export function Billing() {
       const data = await request<AdminSubscription[]>('/billing/subscriptions');
       setSubs(data);
     } catch (e) {
-      addToast({ type: 'error', message: `Failed to load subscriptions: ${String(e)}` });
+      addToast({ type: 'error', title: 'Load failed', message: `Failed to load subscriptions: ${String(e)}` });
     } finally {
       setLoading(false);
     }
@@ -144,10 +144,10 @@ export function Billing() {
     if (!confirm(`Suspend ${sub.tenantName ?? sub.id}? This will block their WhatsApp session.`)) return;
     try {
       await request(`/billing/subscriptions/${sub.id}/suspend`, { method: 'PUT' });
-      addToast({ type: 'success', message: 'Subscription suspended' });
+      addToast({ type: 'success', title: 'Suspended', message: 'Subscription suspended' });
       void load();
     } catch (e) {
-      addToast({ type: 'error', message: String(e) });
+      addToast({ type: 'error', title: 'Error', message: String(e) });
     }
   };
 
@@ -171,7 +171,6 @@ export function Billing() {
       <PageHeader
         title="Billing"
         subtitle="Paystack subscriptions · KES pricing"
-        icon={<CreditCard size={22} />}
         actions={
           <button className="btn-ghost icon-btn" onClick={load} title="Refresh">
             <RefreshCw size={16} className={loading ? 'spin' : ''} />

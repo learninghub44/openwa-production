@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Wifi, CheckCircle2, Clock, XCircle, AlertTriangle,
+  Wifi, CheckCircle2, XCircle, AlertTriangle,
   Copy, Check, ExternalLink, Loader2, ArrowRight, LogOut,
   Smartphone, Key, RefreshCw, CreditCard,
 } from 'lucide-react';
@@ -144,11 +144,10 @@ function Landing({ onLogin, onSignup }: { onLogin: () => void; onSignup: (plan: 
 function SignupForm({
   initialPlan,
   onBack,
-  onSuccess,
 }: {
   initialPlan: Plan;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }) {
   const [plan, setPlan] = useState<Plan>(initialPlan);
   const [name, setName] = useState('');
@@ -594,7 +593,6 @@ export function Portal() {
 // ── Wrapper with plan routing ─────────────────────────────────────────────────
 
 export default function PortalApp() {
-  const [showSignup, setShowSignup] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan>('growth');
   const [step, setStep] = useState<'landing' | 'signup' | 'login' | 'otp' | 'portal'>('landing');
   const [otpEmail, setOtpEmail] = useState('');
